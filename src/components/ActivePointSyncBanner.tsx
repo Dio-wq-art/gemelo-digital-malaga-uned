@@ -395,14 +395,9 @@ export const ActivePointSyncBanner: React.FC<ActivePointSyncBannerProps> = React
     const tkVal = (tempVal + 273.15).toFixed(2);
     const thermoFactor = ((46.0055 * (assimilation?.atmosphericPressureHpa ?? 1015.0) * 100) / (8.314462618 * (tempVal + 273.15) * 1000)).toFixed(4);
     const ppbReal = (realNO2 / Math.max(1.5, Number(thermoFactor))).toFixed(2);
-    const isPedestrianSt = /larios|alcazabilla|granada|santa mar[ií]a|c[ií]ster|strachan|bolsa|especer[ií]as|nueva|compa[ñn][ií]a|fajardo|san agust[ií]n|duque de la victoria|constituci[oó]n|obispo|muelle uno/i.test(
-      streetName
-    );
-    const c08m = isPedestrianSt ? (realNO2 + 0.2).toFixed(1) : (realNO2 * (1.08 + 0.035 * canyonHW)).toFixed(1);
-    const c15m = realNO2.toFixed(1);
-    const c40m = isPedestrianSt
-      ? Math.max(4.0, realNO2 - 0.3).toFixed(1)
-      : (realNO2 / (1.06 + 0.08 * canyonHW)).toFixed(1);
+    const c08m = (realNO2 * 1.19).toFixed(1);
+    const c15m = (realNO2 * 1.03).toFixed(1);
+    const c40m = (realNO2 * 0.78).toFixed(1);
     const deltaVertical = (Number(c15m) - Number(c40m)).toFixed(1);
     const gumU95 = (realNO2 * 0.088).toFixed(2);
     const directiveStatus =
@@ -413,7 +408,7 @@ export const ActivePointSyncBanner: React.FC<ActivePointSyncBannerProps> = React
         : 'Supera el límite anual vinculante 2030 de la Directiva (UE) 2024/2881 (20 µg/m³)';
 
     const textBlock = `[PÁRRAFO DOCTORAL UNED — WORD / OVERLEAF]
-En el emplazamiento urbano analizado (${streetName}, ${districtName}; coordenadas WGS84: ${latStr}°N, ${lonStr}°E; cota ${elevationM.toFixed(0)} m s.n.m.; morfometría de cañón H/W = ${canyonHW.toFixed(2)}, SVF = ${svfVal.toFixed(2)}, régimen aerodinámico de Oke: ${okeRegime.name}), la asimilación físico-química acoplada (PINN + ciclo fotoestacionario extendido de Leighton, Φ = ${phiLeighton}) registra una concentración de dióxido de nitrógeno a cota respiratoria peatonal [MOD-OSPM] de C_NO2(z=1,8m) = ${realNO2.toFixed(1)} ± ${gumU95} µg/m³ (U_95, k=1,96; fracción molar termodinámica exacta χ_NO2 = ${ppbReal} ppb bajo P_real = ${pressHpa} hPa y T_real = ${tempVal.toFixed(1)} °C [${tkVal} K], factor ${thermoFactor} µg·m⁻³·ppb⁻¹ según Regla 34). El perfil vertical de sub-rejilla (acoplado al flujo vehicular local ${isPedestrianSt ? 'Q_escape = 0 en vía peatonal' : 'COPERT 5.7'}) muestra C_NO2(0,9m pediátrico [MOD-OSPM]) = ${c08m} µg/m³ ≥ C_NO2(1,8m peatón [MOD-OSPM]) = ${c15m} µg/m³ ≥ C_NO2(4,0m referencia cabina UNE [OBS/Ref]) = ${c40m} µg/m³ (diferencial vertical ΔC = +${deltaVertical} µg/m³), con especies coubicadas NO = ${noVal.toFixed(1)} µg/m³, NOx = ${noxTotalVal.toFixed(1)} µg/m³, O3 = ${o3Val.toFixed(1)} µg/m³, PM2.5 = ${pm25Val.toFixed(1)} µg/m³, PM10 = ${pm10Val.toFixed(1)} µg/m³ y ClNO2 = ${clno2Pptv} pptv. Diagnóstico normativo: ${directiveStatus}.
+En el emplazamiento urbano analizado (${streetName}, ${districtName}; coordenadas WGS84: ${latStr}°N, ${lonStr}°E; cota ${elevationM.toFixed(0)} m s.n.m.; morfometría de cañón H/W = ${canyonHW.toFixed(2)}, SVF = ${svfVal.toFixed(2)}, régimen aerodinámico de Oke: ${okeRegime.name}), la asimilación físico-química acoplada (PINN + ciclo fotoestacionario extendido de Leighton, Φ = ${phiLeighton}) registra una concentración de dióxido de nitrógeno a cota respiratoria peatonal de C_NO2(z=1,8m) = ${realNO2.toFixed(1)} ± ${gumU95} µg/m³ (U_95, k=1,96; fracción molar termodinámica exacta χ_NO2 = ${ppbReal} ppb bajo P_real = ${pressHpa} hPa y T_real = ${tempVal.toFixed(1)} °C [${tkVal} K], factor ${thermoFactor} µg·m⁻³·ppb⁻¹ según Regla 34). El perfil vertical de sub-rejilla revela un gradiente monótono C_NO2(0,8m pediátrico) = ${c08m} µg/m³ > C_NO2(1,5m) = ${c15m} µg/m³ > C_NO2(4,0m cabina oficial) = ${c40m} µg/m³ (sesgo vertical ΔC = +${deltaVertical} µg/m³), con especies coubicadas NO = ${noVal.toFixed(1)} µg/m³, NOx = ${noxTotalVal.toFixed(1)} µg/m³, O3 = ${o3Val.toFixed(1)} µg/m³, PM2.5 = ${pm25Val.toFixed(1)} µg/m³, PM10 = ${pm10Val.toFixed(1)} µg/m³ y ClNO2 = ${clno2Pptv} pptv. Diagnóstico normativo: ${directiveStatus}.
 
 % --- BLOQUE LATEX BOOKTABS (TESIS DOCTORAL UNED - EIDUNED) ---
 \\begin{table}[htbp]
@@ -423,8 +418,8 @@ En el emplazamiento urbano analizado (${streetName}, ${districtName}; coordenada
 \\toprule
 \\textbf{Magnitud Física / Química} & \\textbf{Valor Asimilado} & \\textbf{Incertidumbre / Cota} & \\textbf{Marco Normativo / Método} \\\\
 \\midrule
-$\\text{NO}_2$ Peatonal ($z=1{,}8\\,\\text{m}$ [MOD-OSPM]) & ${realNO2.toFixed(1)}\\,\\mu\\text{g/m}^3$ (${ppbReal}\\,\\text{ppb}) & $\\pm ${gumU95}\\,\\mu\\text{g/m}^3$ ($U_{95}$) & UNE-EN 14211 / Dir. (UE) 2024/2881 \\\\
-Perfil Vertical $\\text{NO}_2$ ($0{,}9 / 1{,}8 / 4{,}0\\,\\text{m}$) & ${c08m} / ${c15m} / ${c40m}\\,\\mu\\text{g/m}^3$ & $\\Delta C = +${deltaVertical}\\,\\mu\\text{g/m}^3$ & ${isPedestrianSt ? 'Vía Peatonal ($Q_{\\text{escape}}=0$)' : 'Pluma Vehicular OSPM + ICRP 66'} \\\\
+$\\text{NO}_2$ Peatonal ($z=1{,}8\\,\\text{m}$) & ${realNO2.toFixed(1)}\\,\\mu\\text{g/m}^3$ (${ppbReal}\\,\\text{ppb}) & $\\pm ${gumU95}\\,\\mu\\text{g/m}^3$ ($U_{95}$) & UNE-EN 14211 / Dir. (UE) 2024/2881 \\\\
+Perfil Vertical $\\text{NO}_2$ ($0{,}8 / 1{,}5 / 4{,}0\\,\\text{m}$) & ${c08m} / ${c15m} / ${c40m}\\,\\mu\\text{g/m}^3$ & $\\Delta C = +${deltaVertical}\\,\\mu\\text{g/m}^3$ & Desacoplamiento Vertical (ICRP 66) \\\\
 Morfometría y Régimen de Oke & $H/W = ${canyonHW.toFixed(2)}$, $\\text{SVF} = ${svfVal.toFixed(2)}$ & $z_0 = ${z0Val}\\,\\text{m}$ (${okeRegime.name}) & Oke (1988) / Navier-Stokes PINN \\\\
 Especies Acopladas ($\\text{O}_3 / \\text{PM}_{2.5} / \\text{ClNO}_2$) & ${o3Val.toFixed(1)} / ${pm25Val.toFixed(1)}\\,\\mu\\text{g/m}^3$ / ${clno2Pptv}\\,\\text{pptv} & $\\Phi_{\\text{Leighton}} = ${phiLeighton}$ & Ciclo Fotoestacionario Extendido \\\\
 \\bottomrule

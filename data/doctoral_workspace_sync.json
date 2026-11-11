@@ -1,13 +1,13 @@
 {
   "current": {
     "version": "2.5.0-UNED-CLOUD-USB",
-    "updatedAtIso": "2026-11-11T17:55:26.093Z",
+    "updatedAtIso": "2026-11-11T18:12:01.571Z",
     "deviceLabel": "PC Estación Doctoral (Windows)",
     "activePoint": {
-      "lat": 36.72288906870105,
-      "lon": -4.428948753033154,
-      "address": "Calle Jaboneros",
-      "streetName": "Calle Jaboneros"
+      "lat": 36.7196,
+      "lon": -4.42,
+      "address": "Calle Marqués de Larios",
+      "streetName": "Calle Marqués de Larios"
     },
     "multiformatDirectorOrders": [],
     "customDirectorClauses": [],
@@ -55,21 +55,11 @@
         "schools_2024",
         "analysis_menu"
       ],
-      "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
-        "0",
-        "2",
-        "3",
-        "1",
-        "4",
-        "5",
-        "7",
-        "6"
-      ],
       "malaga_dt_tab_order_v1_scientific_header_row1": [
         "portable_cloud_sync",
         "guide",
-        "director",
         "observatory",
+        "director",
         "shortcuts",
         "fair_vram",
         "gemini_crop",
@@ -97,31 +87,41 @@
         "2",
         "3",
         "5"
+      ],
+      "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
+        "0",
+        "2",
+        "3",
+        "1",
+        "4",
+        "5",
+        "7",
+        "6"
       ]
     },
     "defenseLockActive": false
   },
-  "verificationCode": "#UNED-6844",
-  "sha256Signature": "6844F430031AFB5B-55E9EAE86F25BDA8-UNED2026",
+  "verificationCode": "#UNED-957D",
+  "sha256Signature": "957D19B1D91BB0B6-3D436805415AE61A-UNED2026",
   "restorePoints": [
     {
-      "snapshotId": "snap_1794419726093_UNED-6844",
-      "savedAtIso": "2026-11-11T17:55:26.093Z",
+      "snapshotId": "snap_1794420721571_UNED-957D",
+      "savedAtIso": "2026-11-11T18:12:01.571Z",
       "deviceLabel": "PC Estación Doctoral (Windows)",
-      "verificationCode": "#UNED-6844",
+      "verificationCode": "#UNED-957D",
       "ordersCount": 0,
       "clausesCount": 0,
       "approvedDoisCount": 3,
-      "activeStreet": "Calle Jaboneros",
+      "activeStreet": "Calle Marqués de Larios",
       "payload": {
         "version": "2.5.0-UNED-CLOUD-USB",
-        "updatedAtIso": "2026-11-11T17:55:26.093Z",
+        "updatedAtIso": "2026-11-11T18:12:01.571Z",
         "deviceLabel": "PC Estación Doctoral (Windows)",
         "activePoint": {
-          "lat": 36.72288906870105,
-          "lon": -4.428948753033154,
-          "address": "Calle Jaboneros",
-          "streetName": "Calle Jaboneros"
+          "lat": 36.7196,
+          "lon": -4.42,
+          "address": "Calle Marqués de Larios",
+          "streetName": "Calle Marqués de Larios"
         },
         "multiformatDirectorOrders": [],
         "customDirectorClauses": [],
@@ -169,21 +169,11 @@
             "schools_2024",
             "analysis_menu"
           ],
-          "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
-            "0",
-            "2",
-            "3",
-            "1",
-            "4",
-            "5",
-            "7",
-            "6"
-          ],
           "malaga_dt_tab_order_v1_scientific_header_row1": [
             "portable_cloud_sync",
             "guide",
-            "director",
             "observatory",
+            "director",
             "shortcuts",
             "fair_vram",
             "gemini_crop",
@@ -211,14 +201,24 @@
             "2",
             "3",
             "5"
+          ],
+          "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
+            "0",
+            "2",
+            "3",
+            "1",
+            "4",
+            "5",
+            "7",
+            "6"
           ]
         },
         "defenseLockActive": false
       }
     },
     {
-      "snapshotId": "snap_1794419720725_UNED-B682",
-      "savedAtIso": "2026-11-11T17:55:20.725Z",
+      "snapshotId": "snap_1794420715520_UNED-B682",
+      "savedAtIso": "2026-11-11T18:11:55.520Z",
       "deviceLabel": "PC Estación Doctoral (Windows)",
       "verificationCode": "#UNED-B682",
       "ordersCount": 0,
@@ -227,7 +227,7 @@
       "activeStreet": "Alameda Principal, Málaga",
       "payload": {
         "version": "2.5.0-UNED-CLOUD-USB",
-        "updatedAtIso": "2026-11-11T17:55:20.725Z",
+        "updatedAtIso": "2026-11-11T18:11:55.520Z",
         "deviceLabel": "PC Estación Doctoral (Windows)",
         "activePoint": {
           "lat": 36.7168,
@@ -281,21 +281,11 @@
             "schools_2024",
             "analysis_menu"
           ],
-          "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
-            "0",
-            "2",
-            "3",
-            "1",
-            "4",
-            "5",
-            "7",
-            "6"
-          ],
           "malaga_dt_tab_order_v1_scientific_header_row1": [
             "portable_cloud_sync",
             "guide",
-            "director",
             "observatory",
+            "director",
             "shortcuts",
             "fair_vram",
             "gemini_crop",
@@ -323,29 +313,39 @@
             "2",
             "3",
             "5"
+          ],
+          "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
+            "0",
+            "2",
+            "3",
+            "1",
+            "4",
+            "5",
+            "7",
+            "6"
           ]
         },
         "defenseLockActive": false
       }
     },
     {
-      "snapshotId": "snap_1794419513925_UNED-6844",
-      "savedAtIso": "2026-11-11T17:51:53.925Z",
+      "snapshotId": "snap_1794420635420_UNED-957D",
+      "savedAtIso": "2026-11-11T18:10:35.420Z",
       "deviceLabel": "PC Estación Doctoral (Windows)",
-      "verificationCode": "#UNED-6844",
+      "verificationCode": "#UNED-957D",
       "ordersCount": 0,
       "clausesCount": 0,
       "approvedDoisCount": 3,
-      "activeStreet": "Calle Jaboneros",
+      "activeStreet": "Calle Marqués de Larios",
       "payload": {
         "version": "2.5.0-UNED-CLOUD-USB",
-        "updatedAtIso": "2026-11-11T17:51:53.925Z",
+        "updatedAtIso": "2026-11-11T18:10:35.420Z",
         "deviceLabel": "PC Estación Doctoral (Windows)",
         "activePoint": {
-          "lat": 36.72288906870105,
-          "lon": -4.428948753033154,
-          "address": "Calle Jaboneros",
-          "streetName": "Calle Jaboneros"
+          "lat": 36.7196,
+          "lon": -4.42,
+          "address": "Calle Marqués de Larios",
+          "streetName": "Calle Marqués de Larios"
         },
         "multiformatDirectorOrders": [],
         "customDirectorClauses": [],
@@ -393,21 +393,11 @@
             "schools_2024",
             "analysis_menu"
           ],
-          "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
-            "0",
-            "2",
-            "3",
-            "1",
-            "4",
-            "5",
-            "7",
-            "6"
-          ],
           "malaga_dt_tab_order_v1_scientific_header_row1": [
             "portable_cloud_sync",
             "guide",
-            "director",
             "observatory",
+            "director",
             "shortcuts",
             "fair_vram",
             "gemini_crop",
@@ -435,29 +425,39 @@
             "2",
             "3",
             "5"
+          ],
+          "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
+            "0",
+            "2",
+            "3",
+            "1",
+            "4",
+            "5",
+            "7",
+            "6"
           ]
         },
         "defenseLockActive": false
       }
     },
     {
-      "snapshotId": "snap_1794419512305_UNED-6844",
-      "savedAtIso": "2026-11-11T17:51:52.304Z",
+      "snapshotId": "snap_1794420593809_UNED-B682",
+      "savedAtIso": "2026-11-11T18:09:53.809Z",
       "deviceLabel": "PC Estación Doctoral (Windows)",
-      "verificationCode": "#UNED-6844",
+      "verificationCode": "#UNED-B682",
       "ordersCount": 0,
       "clausesCount": 0,
       "approvedDoisCount": 3,
-      "activeStreet": "Calle Carretería",
+      "activeStreet": "Alameda Principal, Málaga",
       "payload": {
         "version": "2.5.0-UNED-CLOUD-USB",
-        "updatedAtIso": "2026-11-11T17:51:52.304Z",
+        "updatedAtIso": "2026-11-11T18:09:53.809Z",
         "deviceLabel": "PC Estación Doctoral (Windows)",
         "activePoint": {
-          "lat": 36.72288906870105,
-          "lon": -4.428948753033154,
-          "address": "Calle Carretería",
-          "streetName": "Calle Carretería"
+          "lat": 36.7168,
+          "lon": -4.4234,
+          "address": "Alameda Principal, Málaga",
+          "streetName": "Alameda Principal"
         },
         "multiformatDirectorOrders": [],
         "customDirectorClauses": [],
@@ -505,21 +505,11 @@
             "schools_2024",
             "analysis_menu"
           ],
-          "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
-            "0",
-            "2",
-            "3",
-            "1",
-            "4",
-            "5",
-            "7",
-            "6"
-          ],
           "malaga_dt_tab_order_v1_scientific_header_row1": [
             "portable_cloud_sync",
             "guide",
-            "director",
             "observatory",
+            "director",
             "shortcuts",
             "fair_vram",
             "gemini_crop",
@@ -547,29 +537,39 @@
             "2",
             "3",
             "5"
+          ],
+          "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
+            "0",
+            "2",
+            "3",
+            "1",
+            "4",
+            "5",
+            "7",
+            "6"
           ]
         },
         "defenseLockActive": false
       }
     },
     {
-      "snapshotId": "snap_1794419498021_UNED-FBC7",
-      "savedAtIso": "2026-11-11T17:51:38.021Z",
-      "deviceLabel": "PC Estación Doctoral (Windows)",
-      "verificationCode": "#UNED-FBC7",
+      "snapshotId": "snap_1793437853729_UNED-D542",
+      "savedAtIso": "2026-10-31T09:10:53.729Z",
+      "deviceLabel": "iPhone Doctoral (iOS)",
+      "verificationCode": "#UNED-D542",
       "ordersCount": 0,
       "clausesCount": 0,
       "approvedDoisCount": 3,
-      "activeStreet": "Calle Rampa de la Aurora",
+      "activeStreet": "Alameda Principal, Málaga",
       "payload": {
         "version": "2.5.0-UNED-CLOUD-USB",
-        "updatedAtIso": "2026-11-11T17:51:38.021Z",
-        "deviceLabel": "PC Estación Doctoral (Windows)",
+        "updatedAtIso": "2026-10-31T09:10:53.729Z",
+        "deviceLabel": "iPhone Doctoral (iOS)",
         "activePoint": {
-          "lat": 36.72175630673931,
-          "lon": -4.425877924167082,
-          "address": "Calle Rampa de la Aurora",
-          "streetName": "Calle Rampa de la Aurora"
+          "lat": 36.7168,
+          "lon": -4.4234,
+          "address": "Alameda Principal, Málaga",
+          "streetName": "Alameda Principal"
         },
         "multiformatDirectorOrders": [],
         "customDirectorClauses": [],
@@ -579,88 +579,8 @@
           "sota_sentinel4_mtg_s1_2025"
         ],
         "dismissedRadarIds": [],
-        "pinnedPointA": {
-          "address": "Calle Marqués de Larios",
-          "lat": 36.7196,
-          "lon": -4.42,
-          "cPoint": 8,
-          "cCabin4m": 7,
-          "cPediatric": 9,
-          "hw": 1,
-          "svf": 0.71,
-          "mqi": 0.32,
-          "pavementLabel": "Asfalto SMA11 (99.8%)"
-        },
-        "tabOrders": {
-          "malaga_dt_tab_order_v1_bottom_dock_categories": [
-            "geodesy_canyons",
-            "mobility_emissions",
-            "microclimate_pbl",
-            "chemical_kinetics",
-            "assimilation_fairmode",
-            "hpc_computing",
-            "q1_frontiers"
-          ],
-          "malaga_dt_tab_order_v1_active_point_banner_pills": [
-            "caqi",
-            "no2",
-            "pinn",
-            "no",
-            "nox",
-            "o3",
-            "pm",
-            "clno2",
-            "meteo",
-            "microscale_drawer",
-            "trees",
-            "history_7d",
-            "schools_2024",
-            "analysis_menu"
-          ],
-          "malaga_dt_tab_order_v1_ribbon_pesta_as_de_confiabilidad_y_trazabilidad_metrol_gica": [
-            "0",
-            "2",
-            "3",
-            "1",
-            "4",
-            "5",
-            "7",
-            "6"
-          ],
-          "malaga_dt_tab_order_v1_scientific_header_row1": [
-            "portable_cloud_sync",
-            "guide",
-            "director",
-            "observatory",
-            "shortcuts",
-            "fair_vram",
-            "gemini_crop",
-            "export_fair"
-          ],
-          "malaga_dt_tab_order_v1_ribbon_1_director-block-1-card_1_director-block-2-card_1_director-block": [
-            "1:$director-annex-8-card",
-            "1:$director-block-2-card",
-            "1:$director-block-3-card",
-            "1:$director-block-4-card",
-            "1:$director-block-5-card",
-            "1:$director-annex-1-card",
-            "1:$director-annex-2-card",
-            "1:$director-annex-3-card",
-            "1:$director-annex-4-card",
-            "1:$director-annex-5-card",
-            "1:$director-annex-6-card",
-            "1:$director-annex-7-card",
-            "1:$director-block-1-card"
-          ],
-          "malaga_dt_tab_order_v1_ribbon_conmutador_de_5_vistas_de_atribuci_n_sensorial": [
-            "4",
-            "0",
-            "1",
-            "2",
-            "3",
-            "5"
-          ]
-        },
+        "pinnedPointA": null,
+        "tabOrders": {},
         "defenseLockActive": false
       }
     }

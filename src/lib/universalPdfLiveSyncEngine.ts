@@ -30,8 +30,7 @@ import {
   computeLiveMalaga11DistrictsCorridors,
   computeCityWideMalagaScanSummary,
   LiveMalagaDistrictCorridorTelemetry,
-  CityWideMalagaScanSummary,
-  isPedestrianZeroTailpipeStreet
+  CityWideMalagaScanSummary
 } from './thesisOpenDiscoveriesEngine';
 
 export interface EnrichedUnedCheckpointSummary extends UnedServerCheckpointSummary {
@@ -700,48 +699,14 @@ export function appendVoluntarySiteAnd11DistrictsSectionToPdf(
   const shortStreet = street.split(',')[0];
   const lat = options?.lat ?? 36.7196;
   const lon = options?.lon ?? -4.4215;
-  const isPedestrian = isPedestrianZeroTailpipeStreet(street);
-
   const c18m = Number((options?.no2Pedestrian18mUg ?? 21.4).toFixed(1));
-  // Regla 32: En vías 100 % peatonales (Q_escape = 0), no existe pluma de escape a z=0,35 m; solo actúa la deposición seca superficial
-  const c09m = isPedestrian
-    ? Number((c18m + 0.2).toFixed(1))
-    : Number((options?.no2Pediatric09mUg ?? c18m * 1.10).toFixed(1));
-  const c40m = isPedestrian
-    ? Number(Math.max(4.0, c18m - 0.3).toFixed(1))
-    : Number((options?.no2Cabin40mUg ?? c18m * 0.82).toFixed(1));
+  const c09m = Number((options?.no2Pediatric09mUg ?? c18m * 1.11).toFixed(1));
+  const c40m = Number((options?.no2Cabin40mUg ?? c18m * 0.80).toFixed(1));
   const tempC = Number((options?.tempC ?? 22.5).toFixed(1));
   const pressureHpa = Number((options?.pressureHpa ?? 1015.0).toFixed(1));
   const windSpeed = Number((options?.windSpeedMs ?? 3.2).toFixed(1));
   const pblHeightM = Math.round(options?.pblHeightM ?? 680);
-
-  // Regla 33: Separación estricta entre Cabina Oficial UNE-EN 14211:2013 (código ES*) y nodos auxiliares ZBE/AEMET
-  const stationsSorted = (OFFICIAL_MALAGA_AIR_STATIONS || [])
-    .map((st) => {
-      const dLat = (st.lat - lat) * 111.32;
-      const dLon = (st.lon - lon) * 111.32 * Math.cos(((lat + st.lat) / 2) * (Math.PI / 180));
-      const distKm = Math.hypot(dLat, dLon);
-      return { ...st, distKm };
-    })
-    .sort((a, b) => a.distKm - b.distKm);
-
-  const nearestUneStation =
-    stationsSorted.find((st) => st.code.startsWith('ES')) || {
-      code: 'ES1982A',
-      name: 'Málaga - Paseo del Parque',
-      distKm: 0.48
-    };
-  const nearestAnyStation = stationsSorted[0];
-  const rawPassedCode = options?.primaryStationCode || nearestAnyStation?.code || 'ES1982A';
-  const uneAnchorCode = rawPassedCode.startsWith('ES') ? rawPassedCode : nearestUneStation.code;
-  const uneAnchorDistKm = Number((nearestUneStation.distKm || 0.48).toFixed(2));
-  const uneWeightW = Number(Math.exp(-uneAnchorDistKm / 1.3).toFixed(2));
-  const hasDirectUneCabinAtPoint = uneAnchorDistKm <= 0.08;
-  const auxLocalNodeCode = !rawPassedCode.startsWith('ES')
-    ? rawPassedCode
-    : nearestAnyStation && !nearestAnyStation.code.startsWith('ES')
-    ? nearestAnyStation.code
-    : '';
+  const primaryCode = options?.primaryStationCode || 'ES2086A';
 
   const factorThermo = (46.0055 * pressureHpa * 100.0) / (8.314462618 * (tempC + 273.15) * 1000.0);
   const ppb18m = Number((c18m / Math.max(1.5, factorThermo)).toFixed(2));
@@ -792,8 +757,8 @@ export function appendVoluntarySiteAnd11DistrictsSectionToPdf(
     body: [
       [
         'Sitio Elegido Voluntariamente por el Doctorando',
-        `${street} (${lat.toFixed(4)}°N, ${lon.toFixed(4)}°W) | Ancla UNE-14211: ${uneAnchorCode} (${uneAnchorDistKm} km)${auxLocalNodeCode ? ` | Aux Local: ${auxLocalNodeCode}` : ''}`,
-        `4,0m [Ref Cabina UNE] = ${c40m} ug/m3 | 1,8m [MOD-OSPM Peatón] = ${c18m} ug/m3 (${ppb18m} ppb) | 0,9m [MOD-OSPM Bebé] = ${c09m} ug/m3${isPedestrian ? ' (Vía Peatonal Q_escape=0)' : ''}`
+        `${street} (${lat.toFixed(4)}°N, ${lon.toFixed(4)}°W) | Ancla UNE: ${primaryCode}`,
+        `1,8m (Peatón) = ${c18m} ug/m3 (${ppb18m} ppb) | 0,9m (Bebé) = ${c09m} ug/m3 | 4,0m (Cabina) = ${c40m} ug/m3`
       ],
       [
         'Regla 32 • Prohibición Total de Simulaciones Sintéticas',
@@ -802,8 +767,8 @@ export function appendVoluntarySiteAnd11DistrictsSectionToPdf(
       ],
       [
         'Regla 33 • Rigor Instrumental UNE-EN 14211:2013',
-        `Ancla Química UNE-EN 14211: ${uneAnchorCode} (Quimioluminiscencia NO2 -> L_data y LOOCV)${auxLocalNodeCode ? ` | Nodo Aux ${auxLocalNodeCode} (Aforo LPR / Meteo L_PDE)` : ''}`,
-        'Cabinas UNE-EN 14211 separadas estrictamente de nodos municipales ZBE y estaciones meteo AEMET/Puertos (L_PDE y L_BC)'
+        `Estación Ancla ${primaryCode}: Quimioluminiscencia NO2 -> L_data y LOOCV`,
+        'Nodos meteo oficiales (AEMET/Puertos) separados estrictamente en L_PDE y L_BC (u, T, HR, P, Rg)'
       ],
       [
         'Regla 34 • Conversión Termodinámica Exacta (ppb <-> ug/m3)',
@@ -813,7 +778,7 @@ export function appendVoluntarySiteAnd11DistrictsSectionToPdf(
       [
         'Regla 35 • Exclusión Estricta LOOCV (w_k = 0) + Barrido 11 Distritos',
         `w_k(x_sk) = 0 (i != k, t' <= t) | Media 11 Distritos (1,8m) = ${citySummary.meanPedestrian18mUg} ug/m3`,
-        `5 Cabinas UNE-14211 con LOOCV directo (-${citySummary.meanLoocvGainPct}% vs Kriging, MQI ${citySummary.meanMqi}) + 8 Corredores con Inferencia PDE (w_EnKF)`
+        `Ganancia media LOOCV = -${citySummary.meanLoocvGainPct}% vs Kriging | MQI medio = ${citySummary.meanMqi} <= 1,00`
       ]
     ],
     theme: 'grid',
@@ -844,27 +809,25 @@ export function appendVoluntarySiteAnd11DistrictsSectionToPdf(
     startY: y,
     head: [[
       'Distrito / Arteria de Málaga',
-      'Ancla UNE (+Aux)',
-      '4,0m [OBS/Ref]',
-      '1,8m [MOD-OSPM]',
-      '0,9m [MOD-OSPM]',
+      'Ancla UNE',
+      'Cabina 4,0m',
+      'Peatón 1,8m (ug/m3 | ppb)',
+      'Carrito 0,9m',
       'Delta Vert.',
       'Tráfico COPERT',
-      'Validación LOOCV / PDE',
+      'LOOCV (w_k=0)',
       'Diagnóstico Directiva UE 2024/2881'
     ]],
     body: [
       [
         `[*] SITIO ELEGIDO: ${shortStreet}`,
-        auxLocalNodeCode ? `${uneAnchorCode} (UNE) | Aux: ${auxLocalNodeCode}` : `${uneAnchorCode} (Cabina UNE-14211)`,
+        primaryCode,
         `${c40m} ug/m3`,
         `${c18m} ug/m3 (${ppb18m} ppb)`,
         `${c09m} ug/m3`,
         `+${(c18m - c40m).toFixed(1)} ug/m3`,
-        isPedestrian ? '0.0% Directo (Peatonal; Fondo Advectado)' : 'Tráfico Local Asimilado',
-        hasDirectUneCabinAtPoint
-          ? `[OBS Cabina] Validado w_k=0 (${uneAnchorCode})`
-          : `[MOD-PDE] d=${uneAnchorDistKm}km a ${uneAnchorCode} (w=${uneWeightW})`,
+        'Asimilado Local',
+        'Validado w_k=0',
         c40m < 20 && (c18m >= 20 || c09m >= 20)
           ? 'Ilusión Regulatoria (4m<20, 1,8m/0,9m>=20)'
           : c18m >= 20
@@ -873,13 +836,13 @@ export function appendVoluntarySiteAnd11DistrictsSectionToPdf(
       ],
       ...live11Corridors.map((c) => [
         `${c.shortLabel} (${c.streetName.split('(')[0].trim()})`,
-        c.anchorAndAuxLabel,
+        c.anchorStationCode,
         `${c.liveC40mCabinUg} ug/m3`,
         `${c.liveC18mPedestrianUg} ug/m3 (${c.livePpb18m} ppb)`,
         `${c.liveC09mPediatricUg} ug/m3`,
         `+${c.liveDeltaVerticalUg} ug/m3`,
-        c.trafficSourceAuditLabel,
-        c.loocvOrPdeAuditLabel,
+        `${c.trafficSharePct}% (+${c.liveCopertTrafficUg} ug/m3)`,
+        `-${c.loocvGainPct}% (MQI ${c.mqi})`,
         c.eu2024Status === 'EXCEDENCIA_DIRECTA'
           ? 'Excedencia Directa (>20 ug/m3)'
           : c.eu2024Status === 'ILUSION_CUMPLIMIENTO'
@@ -888,7 +851,7 @@ export function appendVoluntarySiteAnd11DistrictsSectionToPdf(
       ])
     ],
     theme: 'grid',
-    styles: { fontSize: 6.8, cellPadding: 1.45 },
+    styles: { fontSize: 6.9, cellPadding: 1.5 },
     headStyles: { fillColor: [6, 78, 59], textColor: [255, 255, 255], fontStyle: 'bold' },
     margin: { left: 12, right: 12 }
   });

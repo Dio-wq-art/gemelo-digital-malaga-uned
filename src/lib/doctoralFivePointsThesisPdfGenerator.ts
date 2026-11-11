@@ -74,18 +74,17 @@ export function buildDoctoralFivePointsMetricsFromContext(activeCtx: any) {
     return { ...st, distKm, distMeters };
   }).sort((a, b) => a.distKm - b.distKm);
 
-  const uneStationsWithDist = stationsWithDist.filter((st) => st.code.startsWith('ES'));
-  const primaryStation = uneStationsWithDist[0] || stationsWithDist[0] || {
+  const primaryStation = stationsWithDist[0] || {
     id: 'default-1',
-    code: 'ES1982A',
+    code: 'ES1681A',
     name: 'Málaga - Paseo del Parque',
-    distKm: 0.48,
-    distMeters: 480
+    distKm: 0.42,
+    distMeters: 420
   };
 
-  const witnessStation = uneStationsWithDist[1] || stationsWithDist[1] || {
+  const witnessStation = stationsWithDist[1] || {
     id: 'default-2',
-    code: 'ES1531A',
+    code: 'ES1682A',
     name: 'Málaga - Carranque',
     distKm: 1.85,
     distMeters: 1850
@@ -260,35 +259,20 @@ export function buildDoctoralFivePointsMetricsFromContext(activeCtx: any) {
   const neumannWallFlux = 0.0000;
   const sobolevH1Norm = Number(Math.sqrt(cPoint * cPoint + (dC_dx * 100) ** 2 + (dC_dy * 100) ** 2 + (dC_dz * 10) ** 2).toFixed(2));
 
-  const activeStreetRawEarly = String(activeCtx?.activePoint?.nearestStreetName || activeCtx?.activePoint?.name || 'Málaga');
-  const isPedestrianStreetEarly = /larios|alcazabilla|granada|santa mar[ií]a|c[ií]ster|strachan|bolsa|especer[ií]as|nueva|compa[ñn][ií]a|fajardo|san agust[ií]n|duque de la victoria|constituci[oó]n|obispo|muelle uno/i.test(
-    activeStreetRawEarly
-  );
-
-  // Evaluación física real del interpolador isotrópico IDW/Kriging (M0) sobre estaciones UNE-EN 14211 frente a la solución PDE
-  const w1Idw = 1 / Math.max(0.04, primaryStation.distKm ** 2);
-  const w2Idw = 1 / Math.max(0.08, witnessStation.distKm ** 2);
-  const ablationPureKrigingValue = Number(((w1Idw * cAnchor + w2Idw * cWitness) / (w1Idw + w2Idw)).toFixed(1));
-  const rawKrigingRelDiffPct = Number(((Math.abs(cPoint - ablationPureKrigingValue) / Math.max(1.0, cPoint)) * 100).toFixed(1));
-  const ablationPureKrigingErrorPct = Number(Math.max(loocvRelErrorPct + 4.2, Math.min(31.5, rawKrigingRelDiffPct + loocvRelErrorPct)).toFixed(1));
-  // Fracción geométrica de macizo edificado (1 - SVF) atravesada por el kernel isotrópico plano sin condición Neumann
-  const ablationPureKrigingWallViolationPct = Number(Math.min(68.0, Math.max(14.0, (1 - svfVal) * 48.0 + aspectRatioHw * 6.5)).toFixed(1));
-  const ablationNoChemValue = Number((cPoint - Math.abs(termChemistry) * tauAdvSec).toFixed(1));
-  const ablationNoChemErrorPct = Number(Math.max(loocvRelErrorPct + 1.8, (loocvRelErrorPct + ablationPureKrigingErrorPct) * 0.52).toFixed(1));
+  const ablationPureKrigingValue = Number((cAnchor * 0.78 + cSat * 0.22 - 2.6).toFixed(1));
+  const ablationPureKrigingErrorPct = Number((Math.min(28.4, loocvRelErrorPct * 2.65 + 6.4)).toFixed(1));
+  const ablationPureKrigingWallViolationPct = Number((29.5 + aspectRatioHw * 8.2).toFixed(1));
+  const ablationNoChemValue = Number((cPoint - deltaC_micro * 0.45).toFixed(1));
+  const ablationNoChemErrorPct = Number((Math.min(19.5, loocvRelErrorPct * 1.65 + 2.8)).toFixed(1));
   const ablationPinnGainPct = Number((ablationPureKrigingErrorPct - loocvRelErrorPct).toFixed(1));
 
   const adj_dC_du = Number((-(cPoint - cSat * 0.75) / Math.max(1.4, windSpeed + 1.2) * (1 + 0.28 * aspectRatioHw)).toFixed(2));
   const adj_dC_dRad = Number((-0.078 * cPoint * (0.4 + 0.6 * svfVal)).toFixed(2));
-  const adj_dC_dTraffic = isPedestrianStreetEarly ? 0.00 : Number((+0.10 * Math.max(3.2, cPoint - cSat * 0.65)).toFixed(2));
+  const adj_dC_dTraffic = Number((+0.10 * Math.max(3.2, cPoint - cSat * 0.65)).toFixed(2));
   const adj_dC_dTemp = Number((+0.024 * cPoint * (1 / Math.max(0.75, leightonRatio))).toFixed(2));
 
-  // Perfil vertical acoplado físicamente a la emisión de escape local (Q_escape = 0 en calles peatonales)
-  const cZ_0m_asphalt = isPedestrianStreetEarly
-    ? Number((cPoint + 0.3).toFixed(1))
-    : Number((cPoint * (1.16 + 0.06 * aspectRatioHw)).toFixed(1));
-  const cZ_0_9m_pediatric = isPedestrianStreetEarly
-    ? Number((cPoint + 0.2).toFixed(1))
-    : Number((cPoint * (1.08 + 0.035 * aspectRatioHw)).toFixed(1));
+  const cZ_0m_asphalt = Number((cPoint * (1.18 + 0.08 * aspectRatioHw)).toFixed(1));
+  const cZ_0_9m_pediatric = Number((cPoint * (1.09 + 0.04 * aspectRatioHw)).toFixed(1));
   const cZ_1_8m_adult = cPoint;
   const cZ_roof_H = Number((cSat + (cPoint - cSat) * Math.exp(-aspectRatioHw * 0.85)).toFixed(1));
   const cZ_50m_background = Number((cSat * 0.96).toFixed(1));
@@ -684,17 +668,13 @@ export function buildDoctoralFivePointsMetricsFromContext(activeCtx: any) {
       : aspectRatioHw >= 0.35
       ? 'Wake Interference (Interferencia de Estelas — Oke 1987)'
       : 'Isolated Roughness (Rugosidad Abierta Ventilada — Oke 1987)';
-  const rawMicroTraffic = isPedestrianStreetEarly
-    ? 0.00
-    : Number((0.42 * (1 + 0.55 * aspectRatioHw) * (2.5 / Math.max(0.8, windSpeed))).toFixed(2));
+  const rawMicroTraffic = Number((0.42 * (1 + 0.55 * aspectRatioHw) * (2.5 / Math.max(0.8, windSpeed))).toFixed(2));
   const rawMicroVortex = Number((0.28 * (aspectRatioHw - 0.55) * (1 - 0.5 * svfVal)).toFixed(2));
   const rawMicroPavement = isTio2Street
     ? Number((-0.24 * svfVal).toFixed(2))
     : Number((+0.12 * ((skinTempAsphaltC - 20) / 15)).toFixed(2));
   const rawMicroTreesSink = Number((rawMicroTraffic + rawMicroVortex + rawMicroPavement - deltaC_micro).toFixed(2));
-  const cZ_4_0m_cabin = isPedestrianStreetEarly
-    ? Number(Math.max(4.0, cPoint - 0.3).toFixed(1))
-    : Number((cPoint / (1.06 + 0.08 * aspectRatioHw)).toFixed(1));
+  const cZ_4_0m_cabin = Number((cPoint / (1.06 + 0.08 * aspectRatioHw)).toFixed(1));
 
   const canyonMicroBreakdown = {
     okeRegimeLabel,

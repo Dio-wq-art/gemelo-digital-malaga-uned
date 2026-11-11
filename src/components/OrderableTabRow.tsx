@@ -94,6 +94,13 @@ export function useOrderableIds(storageKey: string, defaultIds: string[]): UseOr
 
   const moveItem = useCallback(
     (id: string, direction: 'left' | 'right' | 'start') => {
+      if (
+        typeof window !== 'undefined' &&
+        ((window as any).__DOCTORAL_DEFENSE_LOCK__ === true ||
+          window.localStorage?.getItem('malaga_phd_defense_lock_v1') === 'true')
+      ) {
+        return;
+      }
       const current = reconcileOrder(readStoredOrder(storageKey) ?? savedOrder, defaultIds);
       const index = current.indexOf(id);
       if (index === -1) return;
@@ -126,6 +133,13 @@ export function useOrderableIds(storageKey: string, defaultIds: string[]): UseOr
   );
 
   const resetOrder = useCallback(() => {
+    if (
+      typeof window !== 'undefined' &&
+      ((window as any).__DOCTORAL_DEFENSE_LOCK__ === true ||
+        window.localStorage?.getItem('malaga_phd_defense_lock_v1') === 'true')
+    ) {
+      return;
+    }
     clearStoredOrder(storageKey);
     setSavedOrder(null);
     if (typeof window !== 'undefined') {
@@ -154,7 +168,7 @@ export interface OrderableTabItemProps {
 /**
  * Envoltorio quirúrgico para cualquier pestaña, píldora o botón:
  * Muestra controles flotantes ◀ / ▶ al pasar el ratón (y soporta Shift+◀ para traer al principio)
- * dentro de la cota superior-derecha visible (top-0) para evitar recorte en contenedores overflow-x-auto.
+ * sin alterar el ancho ni saturar la interfaz.
  */
 export const OrderableTabItem: React.FC<OrderableTabItemProps> = ({
   id,
@@ -189,14 +203,14 @@ export const OrderableTabItem: React.FC<OrderableTabItemProps> = ({
     >
       {children}
 
-      {/* Micro-controles flotantes ◀ ▶ dentro del borde superior-derecho visible (top-0) sin recorte por overflow-x-auto */}
+      {/* Micro-controles flotantes ◀ ▶ posicionados en el borde superior sin tapar el clic de la pestaña */}
       <div
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
-        className={`hidden group-hover/orderable:inline-flex group-focus-within/orderable:inline-flex items-center gap-0.5 absolute ${
-          compact ? 'top-0 right-0.5 scale-95 origin-top-right' : 'top-0 right-0.5 scale-95 origin-top-right'
-        } z-[120] bg-slate-950/95 border border-sky-400/90 rounded px-0.5 py-0 shadow-[0_2px_10px_rgba(0,0,0,0.95)] backdrop-blur-xs select-none pointer-events-auto`}
+        className={`hidden [@media(hover:hover)_and_(pointer:fine)]:group-hover/orderable:inline-flex items-center gap-0.5 absolute ${
+          compact ? '-top-2 right-0 scale-90 origin-top-right' : '-top-2 right-0.5 scale-90 origin-top-right'
+        } z-[80] bg-slate-950/95 border border-cyan-500/80 rounded px-0.5 py-0 shadow-[0_2px_8px_rgba(0,0,0,0.9)] backdrop-blur-xs select-none pointer-events-auto`}
       >
         {index > 1 && (
           <button
@@ -206,7 +220,7 @@ export const OrderableTabItem: React.FC<OrderableTabItemProps> = ({
               e.stopPropagation();
               onMove(id, 'start');
             }}
-            className="px-0.5 py-0.5 text-amber-300 hover:text-white hover:bg-amber-700/90 rounded-xs cursor-pointer transition-colors"
+            className="p-0.5 text-amber-300 hover:text-white hover:bg-amber-800/80 rounded-xs cursor-pointer transition-colors"
             title="Llevar esta pestaña a la 1.ª posición de la izquierda (o Alt+Shift+Clic)"
             aria-label="Mover al inicio"
           >
@@ -220,8 +234,8 @@ export const OrderableTabItem: React.FC<OrderableTabItemProps> = ({
             e.stopPropagation();
             onMove(id, e.shiftKey ? 'start' : 'left');
           }}
-          className="px-0.5 py-0.5 text-sky-300 hover:text-white hover:bg-sky-700/90 rounded-xs cursor-pointer transition-colors"
-          title="Desplazar pestaña 1 posición a la izquierda ◀ (Shift+Clic para llevar al inicio, o Alt+Clic)"
+          className="p-0.5 text-cyan-300 hover:text-white hover:bg-cyan-800/80 rounded-xs cursor-pointer transition-colors"
+          title="Desplazar pestaña a la izquierda ◀ (Shift+Clic para llevar al inicio, o Alt+Clic)"
           aria-label="Mover pestaña a la izquierda"
         >
           <ChevronLeft className="w-2.5 h-2.5" />
@@ -233,8 +247,8 @@ export const OrderableTabItem: React.FC<OrderableTabItemProps> = ({
             e.stopPropagation();
             onMove(id, 'right');
           }}
-          className="px-0.5 py-0.5 text-sky-300 hover:text-white hover:bg-sky-700/90 rounded-xs cursor-pointer transition-colors"
-          title="Desplazar pestaña 1 posición a la derecha ▶ (o Alt+Clic Derecho)"
+          className="p-0.5 text-cyan-300 hover:text-white hover:bg-cyan-800/80 rounded-xs cursor-pointer transition-colors"
+          title="Desplazar pestaña a la derecha ▶ (o Alt+Clic Derecho)"
           aria-label="Mover pestaña a la derecha"
         >
           <ChevronRight className="w-2.5 h-2.5" />

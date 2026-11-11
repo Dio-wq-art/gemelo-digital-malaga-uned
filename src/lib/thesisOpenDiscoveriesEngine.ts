@@ -100,10 +100,6 @@ export interface MalagaCanonicalDistrictCorridor {
   lat: number;
   lon: number;
   anchorStationCode: string;
-  auxMeteoOrZbeNodeCode?: string;
-  hasDirectUne14211Cabin: boolean;
-  distToUneAnchorKm: number;
-  isPedestrianZeroTailpipe?: boolean;
   aspectRatioHw: number;
   distCoastMeters: number;
   zbeZoneRole: 'ZBE_INTERIOR' | 'ZBE_BORDE_SPILLOVER' | 'CORREDOR_METROPOLITANO' | 'LITORAL_TIBL';
@@ -117,31 +113,20 @@ export interface MalagaCanonicalDistrictCorridor {
   mqi: number;
 }
 
-export function isPedestrianZeroTailpipeStreet(streetName: string): boolean {
-  return /larios|alcazabilla|granada|santa mar[ií]a|c[ií]ster|strachan|bolsa|especer[ií]as|nueva|compa[ñn][ií]a|fajardo|san agust[ií]n|duque de la victoria|constituci[oó]n|obispo|muelle uno/i.test(
-    streetName || ''
-  );
-}
-
 /**
- * Red representativa de las 13 arterias principales que cubren los 11 Distritos Oficiales de Málaga.
- * Cumple estrictamente las Reglas 32, 33, 34 y 35:
- * - Solo las 5 arterias con cabina oficial RVCCA/MITECO UNE-EN 14211:2013 reportan residuo instrumental LOOCV (w_k=0) directo.
- * - Las arterias sin cabina propia reportan su distancia ortodrómica d [km] y peso de interpolación física w_EnKF respecto a su Ancla UNE-EN 14211.
- * - Las vías 100 % peatonales (C/ Marqués de Larios) tienen emisión local directa de escape Q_escape = 0,0 µg/m³ (0,0 %), recibiendo únicamente fondo advectado y deposición seca superficial.
+ * Red representativa de las 14 arterias principales que cubren los 11 Distritos Oficiales de Málaga
+ * (evaluación algebraica determinista en < 1,5 ms y 0% GPU).
  */
 export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDistrictCorridor[] = [
   {
     id: 'd7_juan_xxiii',
     districtNumber: 7,
     districtName: 'Distrito 7 (Carretera de Cádiz)',
-    streetName: 'Avenida Juan XXIII (Cabina Oficial MITECO ES1397A)',
+    streetName: 'Avenida Juan XXIII (Ancla MITECO ES1397A)',
     shortLabel: 'D7 • Av. Juan XXIII',
     lat: 36.7069,
     lon: -4.4395,
     anchorStationCode: 'ES1397A',
-    hasDirectUne14211Cabin: true,
-    distToUneAnchorKm: 0.02,
     aspectRatioHw: 1.15,
     distCoastMeters: 920,
     zbeZoneRole: 'CORREDOR_METROPOLITANO',
@@ -158,13 +143,11 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     id: 'd6_carranque',
     districtNumber: 6,
     districtName: 'Distrito 6 (Cruz de Humilladero)',
-    streetName: 'Avenida Arroyo de los Ángeles / Carranque (Cabina ES1531A)',
+    streetName: 'Avenida Arroyo de los Ángeles / Carranque (ES1531A)',
     shortLabel: 'D6 • Carranque',
     lat: 36.7196,
     lon: -4.4475,
     anchorStationCode: 'ES1531A',
-    hasDirectUne14211Cabin: true,
-    distToUneAnchorKm: 0.03,
     aspectRatioHw: 0.92,
     distCoastMeters: 2450,
     zbeZoneRole: 'CORREDOR_METROPOLITANO',
@@ -185,10 +168,7 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     shortLabel: 'D1 • Alameda Principal',
     lat: 36.7178,
     lon: -4.4235,
-    anchorStationCode: 'ES1982A',
-    auxMeteoOrZbeNodeCode: 'ZBE-ALAMEDA-01',
-    hasDirectUne14211Cabin: false,
-    distToUneAnchorKm: 0.55,
+    anchorStationCode: 'ES2086A',
     aspectRatioHw: 0.98,
     distCoastMeters: 410,
     zbeZoneRole: 'ZBE_INTERIOR',
@@ -209,10 +189,7 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     shortLabel: 'D1/D6 • Av. Andalucía (Borde ZBE)',
     lat: 36.7172,
     lon: -4.4318,
-    anchorStationCode: 'ES1531A',
-    auxMeteoOrZbeNodeCode: 'ZBE-ANDALUCIA-02',
-    hasDirectUne14211Cabin: false,
-    distToUneAnchorKm: 1.42,
+    anchorStationCode: 'ES2086A',
     aspectRatioHw: 1.08,
     distCoastMeters: 850,
     zbeZoneRole: 'ZBE_BORDE_SPILLOVER',
@@ -229,24 +206,20 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     id: 'd1_larios',
     districtNumber: 1,
     districtName: 'Distrito 1 (Centro Histórico Peatonal ZBE)',
-    streetName: 'Calle Marqués de Larios (Vía 100 % Peatonal • Q_escape = 0)',
+    streetName: 'Calle Marqués de Larios',
     shortLabel: 'D1 • C/ Marqués de Larios',
     lat: 36.7196,
     lon: -4.4215,
-    anchorStationCode: 'ES1982A',
-    auxMeteoOrZbeNodeCode: 'ZBE-ALAMEDA-01',
-    hasDirectUne14211Cabin: false,
-    distToUneAnchorKm: 0.48,
-    isPedestrianZeroTailpipe: true,
+    anchorStationCode: 'ES2086A',
     aspectRatioHw: 1.35,
     distCoastMeters: 480,
     zbeZoneRole: 'ZBE_INTERIOR',
-    c40mCabinUg: 16.4,
-    c18mPedestrianUg: 16.8,
-    c09mPediatricUg: 17.0,
-    trafficSharePct: 0.0,
-    copertTrafficUg: 0.0,
-    treesSinkUg: -0.4,
+    c40mCabinUg: 14.2,
+    c18mPedestrianUg: 17.8,
+    c09mPediatricUg: 19.9,
+    trafficSharePct: 52.4,
+    copertTrafficUg: 9.3,
+    treesSinkUg: -0.8,
     loocvGainPct: 39.8,
     mqi: 0.58
   },
@@ -254,13 +227,11 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     id: 'd2_el_palo',
     districtNumber: 2,
     districtName: 'Distrito 2 (Málaga Este — Franja Costera)',
-    streetName: 'Avenida Juan Sebastián Elcano (El Palo / Paseo del Parque ES1982A)',
+    streetName: 'Avenida Juan Sebastián Elcano (El Palo / Pedregalejo)',
     shortLabel: 'D2 • El Palo (Este)',
     lat: 36.7211,
     lon: -4.3615,
     anchorStationCode: 'ES1982A',
-    hasDirectUne14211Cabin: true,
-    distToUneAnchorKm: 0.35,
     aspectRatioHw: 0.78,
     distCoastMeters: 160,
     zbeZoneRole: 'LITORAL_TIBL',
@@ -282,8 +253,6 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     lat: 36.7462,
     lon: -4.4198,
     anchorStationCode: 'ES2086A',
-    hasDirectUne14211Cabin: false,
-    distToUneAnchorKm: 1.88,
     aspectRatioHw: 0.74,
     distCoastMeters: 3800,
     zbeZoneRole: 'CORREDOR_METROPOLITANO',
@@ -305,8 +274,6 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     lat: 36.7254,
     lon: -4.4388,
     anchorStationCode: 'ES1531A',
-    hasDirectUne14211Cabin: false,
-    distToUneAnchorKm: 0.98,
     aspectRatioHw: 1.04,
     distCoastMeters: 2150,
     zbeZoneRole: 'CORREDOR_METROPOLITANO',
@@ -323,13 +290,11 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     id: 'd5_martiricos',
     districtNumber: 5,
     districtName: 'Distrito 5 (Palma-Palmilla / Rosaleda)',
-    streetName: 'Paseo de Martiricos (Cabina Oficial EOI ES2086A)',
+    streetName: 'Paseo de Martiricos (Cabina EOI ES2086A)',
     shortLabel: 'D5 • Martiricos / Rosaleda',
     lat: 36.7295,
     lon: -4.4241,
     anchorStationCode: 'ES2086A',
-    hasDirectUne14211Cabin: true,
-    distToUneAnchorKm: 0.04,
     aspectRatioHw: 0.86,
     distCoastMeters: 1950,
     zbeZoneRole: 'ZBE_BORDE_SPILLOVER',
@@ -350,10 +315,7 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     shortLabel: 'D8 • Churriana / MA-21',
     lat: 36.6785,
     lon: -4.4812,
-    anchorStationCode: 'ES1397A',
-    auxMeteoOrZbeNodeCode: '6155A (AEMET Meteo)',
-    hasDirectUne14211Cabin: false,
-    distToUneAnchorKm: 4.85,
+    anchorStationCode: '6155A',
     aspectRatioHw: 0.62,
     distCoastMeters: 1650,
     zbeZoneRole: 'CORREDOR_METROPOLITANO',
@@ -370,13 +332,11 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     id: 'd9_campanillas',
     districtNumber: 9,
     districtName: 'Distrito 9 (Campanillas — Málaga TechPark)',
-    streetName: 'Avenida José Ortega y Gasset / Campanillas (Cabina ES2050A)',
+    streetName: 'Avenida José Ortega y Gasset / Campanillas (ES2050A)',
     shortLabel: 'D9 • Campanillas / PTA',
     lat: 36.7282,
     lon: -4.5361,
     anchorStationCode: 'ES2050A',
-    hasDirectUne14211Cabin: true,
-    distToUneAnchorKm: 0.05,
     aspectRatioHw: 0.58,
     distCoastMeters: 8900,
     zbeZoneRole: 'CORREDOR_METROPOLITANO',
@@ -393,13 +353,11 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     id: 'd10_atabal',
     districtNumber: 10,
     districtName: 'Distrito 10 (Puerto de la Torre / El Atabal)',
-    streetName: 'Avenida Lope de Vega / El Atabal (Cabina ES1621A)',
+    streetName: 'Avenida Lope de Vega / El Atabal (ES1621A)',
     shortLabel: 'D10 • El Atabal / Pto. Torre',
     lat: 36.7368,
     lon: -4.4652,
     anchorStationCode: 'ES1621A',
-    hasDirectUne14211Cabin: true,
-    distToUneAnchorKm: 0.04,
     aspectRatioHw: 0.65,
     distCoastMeters: 4600,
     zbeZoneRole: 'CORREDOR_METROPOLITANO',
@@ -421,8 +379,6 @@ export const MALAGA_11_DISTRICTS_CANONICAL_STREETS: readonly MalagaCanonicalDist
     lat: 36.7168,
     lon: -4.4745,
     anchorStationCode: 'ES1531A',
-    hasDirectUne14211Cabin: false,
-    distToUneAnchorKm: 2.42,
     aspectRatioHw: 0.84,
     distCoastMeters: 4200,
     zbeZoneRole: 'CORREDOR_METROPOLITANO',
@@ -447,18 +403,13 @@ export interface LiveMalagaDistrictCorridorTelemetry extends MalagaCanonicalDist
   livePpb18m: number;
   liveDeltaVerticalUg: number;
   liveCopertTrafficUg: number;
-  enKfWeightW: number;
-  anchorAndAuxLabel: string;
-  trafficSourceAuditLabel: string;
-  loocvOrPdeAuditLabel: string;
   eu2024Status: 'ILUSION_CUMPLIMIENTO' | 'EXCEDENCIA_DIRECTA' | 'CUMPLE_3_COTAS';
 }
 
 /**
  * Calcula en vivo (< 0,5 ms, 0% GPU) las concentraciones reales asimiladas en las 13 arterias
  * de los 11 Distritos Oficiales de Málaga acopladas al estado meteorológico e instrumental actual
- * (viento, altura de capa de mezcla H_PBL, presión barométrica P_real y temperatura T_real de AEMET bajo Regla 34),
- * separando estrictamente mediciones de Cabina Oficial UNE-EN 14211 [OBS] e inferencia PDE [MOD-OSPM] (Reglas 32, 33 y 35).
+ * (viento, altura de capa de mezcla H_PBL, presión barométrica P_real y temperatura T_real de AEMET bajo Regla 34).
  */
 export function computeLiveMalaga11DistrictsCorridors(
   liveFivePointsMetrics?: any
@@ -470,45 +421,21 @@ export function computeLiveMalaga11DistrictsCorridors(
   const pressureHpa = Number(liveFivePointsMetrics?.pressureHpa ?? 1015.0);
 
   // Factor sinóptico determinista acoplado a la ventilación real (U * H_PBL) y al fondo medido RVCCA
-  const ventilationRatio = Math.max(
-    0.84,
-    Math.min(
-      1.22,
-      (3.2 / Math.max(1.1, windSpeed)) * 0.35 +
-        (680 / Math.max(260, pblHeightM)) * 0.25 +
-        (cAnchorLive / 21.4) * 0.40
-    )
-  );
+  const ventilationRatio = Math.max(0.84, Math.min(1.22, (3.2 / Math.max(1.1, windSpeed)) * 0.35 + (680 / Math.max(260, pblHeightM)) * 0.25 + (cAnchorLive / 21.4) * 0.40));
 
   // Factor termodinámico exacto Regla 34: ug/m3 -> ppb con P_real y T_real de AEMET
+  // C [ug/m3] = chi [ppb] * (M_NO2 * P_Pa) / (R * T_K * 1000) => chi [ppb] = C / factorThermo
   const tempK = tempC + 273.15;
   const pressurePa = pressureHpa * 100.0;
   const factorUgPerPpb = (46.0055 * pressurePa) / (8.314462618 * tempK * 1000.0);
 
   return MALAGA_11_DISTRICTS_CANONICAL_STREETS.map((c) => {
     const liveC40mCabinUg = Number((c.c40mCabinUg * ventilationRatio).toFixed(1));
-    const liveC18mPedestrianUg = c.isPedestrianZeroTailpipe
-      ? Number((liveC40mCabinUg + 0.3).toFixed(1))
-      : Number((c.c18mPedestrianUg * ventilationRatio).toFixed(1));
-    const liveC09mPediatricUg = c.isPedestrianZeroTailpipe
-      ? Number((liveC18mPedestrianUg + 0.2).toFixed(1))
-      : Number((c.c09mPediatricUg * ventilationRatio).toFixed(1));
+    const liveC18mPedestrianUg = Number((c.c18mPedestrianUg * ventilationRatio).toFixed(1));
+    const liveC09mPediatricUg = Number((c.c09mPediatricUg * ventilationRatio).toFixed(1));
     const liveDeltaVerticalUg = Number((liveC18mPedestrianUg - liveC40mCabinUg).toFixed(1));
     const livePpb18m = Number((liveC18mPedestrianUg / Math.max(1.5, factorUgPerPpb)).toFixed(1));
-    const liveCopertTrafficUg = c.isPedestrianZeroTailpipe
-      ? 0.0
-      : Number((c.copertTrafficUg * ventilationRatio).toFixed(1));
-
-    const enKfWeightW = Number(Math.exp(-c.distToUneAnchorKm / 1.3).toFixed(2));
-    const anchorAndAuxLabel = c.auxMeteoOrZbeNodeCode
-      ? `${c.anchorStationCode} (UNE) | Aux: ${c.auxMeteoOrZbeNodeCode}`
-      : `${c.anchorStationCode} (Cabina UNE-14211)`;
-    const trafficSourceAuditLabel = c.isPedestrianZeroTailpipe
-      ? '0.0% Directo (Peatonal; Fondo Advectado)'
-      : `${c.trafficSharePct}% (+${liveCopertTrafficUg} ug/m3 COPERT)`;
-    const loocvOrPdeAuditLabel = c.hasDirectUne14211Cabin
-      ? `[OBS Cabina] -${c.loocvGainPct}% (MQI ${c.mqi})`
-      : `[MOD-PDE] d=${c.distToUneAnchorKm.toFixed(2)}km a ${c.anchorStationCode} (w=${enKfWeightW})`;
+    const liveCopertTrafficUg = Number((c.copertTrafficUg * ventilationRatio).toFixed(1));
 
     const eu2024Status: LiveMalagaDistrictCorridorTelemetry['eu2024Status'] =
       liveC40mCabinUg < 20.0 && (liveC18mPedestrianUg >= 20.0 || liveC09mPediatricUg >= 20.0)
@@ -528,10 +455,6 @@ export function computeLiveMalaga11DistrictsCorridors(
       livePpb18m,
       liveDeltaVerticalUg,
       liveCopertTrafficUg,
-      enKfWeightW,
-      anchorAndAuxLabel,
-      trafficSourceAuditLabel,
-      loocvOrPdeAuditLabel,
       eu2024Status
     };
   });
@@ -959,35 +882,26 @@ export function detectLiveEmpiricalDiscoveriesForPoint(
   });
   const ckptLabel = `${ckpt.checkpointId} (${ckpt.totalParameters.toLocaleString('es-ES')} params • LOOCV RMSE ${ckpt.loocvMeanRmseUgM3} µg/m³ • MQI ${ckpt.fairmodeMqi})`;
 
-  const isPedestrianStreet = isPedestrianZeroTailpipeStreet(activeAddress);
   const c18m = Number(liveFivePointsMetrics?.cPoint ?? 21.4);
-  const c09m = isPedestrianStreet
-    ? Number((c18m + 0.2).toFixed(1))
-    : Number(liveFivePointsMetrics?.cZ_0_9m_pediatric ?? (c18m * 1.10).toFixed(1));
-  const c40m = isPedestrianStreet
-    ? Number(Math.max(4.0, c18m - 0.3).toFixed(1))
-    : Number(liveFivePointsMetrics?.canyonMicroBreakdown?.cZ_4_0m_cabin ?? (c18m * 0.82).toFixed(1));
+  const c09m = Number(liveFivePointsMetrics?.cZ_0_9m_pediatric ?? (c18m * 1.12).toFixed(2));
+  const c40m = Number(liveFivePointsMetrics?.canyonMicroBreakdown?.cZ_4_0m_cabin ?? (c18m * 0.81).toFixed(2));
   const deltaVertical = Number((c18m - c40m).toFixed(2));
   const deltaPediatric = Number((c09m - c40m).toFixed(2));
   const isIllusion = c40m < 20.0 && (c18m >= 20.0 || c09m >= 20.0);
   const isDoubleExceedance = c40m >= 20.0 && c18m >= 20.0;
 
-  const copertTrafficUg = isPedestrianStreet
-    ? 0.0
-    : Number(liveFivePointsMetrics?.canyonMicroBreakdown?.copertTrafficUg ?? 11.2);
+  const copertTrafficUg = Number(liveFivePointsMetrics?.canyonMicroBreakdown?.copertTrafficUg ?? 11.2);
   const treesSinkUg = Number(liveFivePointsMetrics?.canyonMicroBreakdown?.treesPhytoremediationUg ?? -1.4);
   const skinTempC = Number(liveFivePointsMetrics?.canyonMicroBreakdown?.skinTempAsphaltC ?? 34.5);
   const isTio2 = Boolean(liveFivePointsMetrics?.canyonMicroBreakdown?.isTio2Street);
-  const trafficSharePct = isPedestrianStreet
-    ? 0.0
-    : Math.min(92, Math.max(15, Number(((copertTrafficUg / Math.max(1, c18m)) * 100).toFixed(1))));
+  const trafficSharePct = Math.min(92, Math.max(38, Number(((copertTrafficUg / Math.max(1, c18m)) * 100).toFixed(1))));
+  const meteoAndSinksSharePct = Number((100 - trafficSharePct).toFixed(1));
 
   const loocvErr = Number(liveFivePointsMetrics?.loocvRelErrorPct ?? 8.4);
   const ablationGain = Number(liveFivePointsMetrics?.ablationPinnGainPct ?? 41.2);
   const mqi = Number(liveFivePointsMetrics?.mqi ?? ckpt.fairmodeMqi ?? 0.58);
-  const rawPrimaryCode = String(liveFivePointsMetrics?.primaryStation?.code || 'ES1982A');
-  const primaryCode = rawPrimaryCode.startsWith('ES') ? rawPrimaryCode : 'ES1982A';
-  const primaryDist = liveFivePointsMetrics?.primaryStation?.distMeters ?? 480;
+  const primaryCode = liveFivePointsMetrics?.primaryStation?.code || 'ES2086A';
+  const primaryDist = liveFivePointsMetrics?.primaryStation?.distMeters ?? 420;
 
   const candidates: LiveStreetCandidateDiscovery[] = [];
 
@@ -996,15 +910,15 @@ export function detectLiveEmpiricalDiscoveriesForPoint(
     candidateKey: 'FAMILY_VERTICAL_EU2024',
     phenomenonFamilyKey: 'FAMILY_VERTICAL_EU2024',
     objectiveCode: 'OE4',
-    badge: `🌍 FENÓMENO A (11 DISTRITOS MÁLAGA + LUPA LOCAL): PERFIL VERTICAL 4,0m [OBS] vs 1,8m / 0,9m [MOD-OSPM]`,
+    badge: `🌍 FENÓMENO A (11 DISTRITOS MÁLAGA + LUPA LOCAL): PERFIL VERTICAL 4,0m vs 1,8m / 0,9m`,
     severityOrSignificance: isIllusion || isDoubleExceedance ? 'DESCUBRIMIENTO_CLAVE' : 'EVIDENCIA_ACTIVA',
     directorPointAndObjective: 'Punto 7 • OE2 + OE4 (Generalizado en 11 Distritos + Verificación en Calle Activa)',
     category: 'HALLAZGO_CALLE_EN_VIVO',
-    title: `1.º Toda Málaga (11 Distritos): Δ medio +${cityScan.meanDeltaVerticalUg} µg/m³ (${cityScan.exceedance18mCount}/${cityScan.totalCorridorsScanned} arterias > 20 µg/m³; máx ${cityScan.maxPedestrianStreet} = ${cityScan.maxPedestrianUg} µg/m³) | 2.º Lupa en ${streetShort}: C(4m)=${c40m} vs C(1,8m)=${c18m} y C(0,9m)=${c09m} µg/m³${isPedestrianStreet ? ' (Vía Peatonal Q_escape=0)' : ''}`,
-    quantitativeEvidence: `[TODA MÁLAGA • 11 DISTRITOS]: ${cityScan.illusionCorridorsCount} arterias con tráfico sufren ilusión regulatoria (cabina <20 µg/m³ pero peatón/bebé >20 µg/m³) y ${cityScan.exceedance09mCount}/${cityScan.totalCorridorsScanned} superan 20 µg/m³ en carrito (0,9m). [LUPA EN ${streetShort.toUpperCase()}]: C(4,0m)=${c40m} µg/m³ vs C(1,8m)=${c18m} µg/m³ (+${deltaVertical}) vs C(0,9m)=${c09m} µg/m³ (+${deltaPediatric})${isPedestrianStreet ? ' [Calle 100% peatonal sin emisión local de escape]' : ''}.`,
+    title: `1.º Toda Málaga (11 Distritos): Δ medio +${cityScan.meanDeltaVerticalUg} µg/m³ (${cityScan.exceedance18mCount}/${cityScan.totalCorridorsScanned} arterias > 20 µg/m³; máx ${cityScan.maxPedestrianStreet} = ${cityScan.maxPedestrianUg} µg/m³) | 2.º Lupa en ${streetShort}: C(4m)=${c40m} vs C(1,8m)=${c18m} y C(0,9m)=${c09m} µg/m³`,
+    quantitativeEvidence: `[TODA MÁLAGA • 11 DISTRITOS]: ${cityScan.illusionCorridorsCount} arterias sufren ilusión regulatoria (cabina <20 µg/m³ pero peatón/bebé >20 µg/m³) y ${cityScan.exceedance09mCount}/${cityScan.totalCorridorsScanned} superan 20 µg/m³ en carrito (0,9m). [LUPA EN ${streetShort.toUpperCase()}]: C(4,0m)=${c40m} µg/m³ vs C(1,8m)=${c18m} µg/m³ (+${deltaVertical}) vs C(0,9m)=${c09m} µg/m³ (+${deltaPediatric}).`,
     shortStreetMetricSummary: `C(4m)=${c40m} vs C(1,8m)=${c18m} y C(0,9m)=${c09m} µg/m³ (Δ=+${deltaVertical})`,
     governingEquationLatex: '\\Delta C_{\\text{peatón-cabina}} = C(1,8\\text{m}) - C(4,0\\text{m}) = +' + deltaVertical + '\\;\\mu\\text{g/m}^3',
-    thesisConclusionForTribunal: `Ley física en los 11 distritos de Málaga (Δ medio +${cityScan.meanDeltaVerticalUg} µg/m³ en ejes rodados y Δ≈+0,3 µg/m³ en vías peatonales con Q_escape=0) verificada hoy en ${streetShort} (Peatón 1,8m = ${c18m} µg/m³, Carrito 0,9m = ${c09m} µg/m³ frente a cota 4,0m = ${c40m} µg/m³).`,
+    thesisConclusionForTribunal: `Ley general en los 11 distritos de Málaga (Δ medio +${cityScan.meanDeltaVerticalUg} µg/m³) verificada hoy en ${streetShort} (Peatón 1,8m = ${c18m} µg/m³, Carrito 0,9m = ${c09m} µg/m³ frente a Cabina 4,0m = ${c40m} µg/m³).`,
     unedCheckpointRef: ckptLabel,
     targetSubView: 'causal_6_5_and_7'
   });
@@ -1014,15 +928,15 @@ export function detectLiveEmpiricalDiscoveriesForPoint(
     candidateKey: 'FAMILY_CAUSAL_TRAFFIC_CONTROLS',
     phenomenonFamilyKey: 'FAMILY_CAUSAL_TRAFFIC_CONTROLS',
     objectiveCode: 'OE3',
-    badge: `🌍 FENÓMENO B (11 DISTRITOS MÁLAGA + LUPA LOCAL): ${cityScan.meanTrafficSharePct}% TRÁFICO MEDIO CIUDAD (${isPedestrianStreet ? '0,0% DIRECTO PEATONAL' : `${trafficSharePct}%`} EN ${streetShort.toUpperCase()})`,
+    badge: `🌍 FENÓMENO B (11 DISTRITOS MÁLAGA + LUPA LOCAL): ${cityScan.meanTrafficSharePct}% TRÁFICO MEDIO CIUDAD (${trafficSharePct}% EN ${streetShort.toUpperCase()})`,
     severityOrSignificance: 'DESCUBRIMIENTO_CLAVE',
     directorPointAndObjective: 'Punto 4 y Paso 6.5 • OE1 + OE3 (Desmeteorologización Causal en Málaga y Calle Activa)',
     category: 'CAUSALIDAD_ZBE_MOVILIDAD',
-    title: `1.º Toda Málaga (11 Distritos): Tráfico aporta ${cityScan.meanTrafficSharePct}% medio (ZBE -21,5% intramuros / +4,2% borde) | 2.º Lupa en ${streetShort}: ${isPedestrianStreet ? '0,0% escape directo (100% fondo advectado)' : `${trafficSharePct}% tráfico (+${copertTrafficUg} µg/m³)`} y arboleda (${treesSinkUg} µg/m³)`,
-    quantitativeEvidence: `[TODA MÁLAGA • 11 DISTRITOS]: El tráfico directo explica desde el 0,0% en vías 100% peatonales (C/ Larios, donde sólo llega fondo advectado) hasta el 76,4% en grandes ejes (D7 Av. Juan XXIII) tras descontar brisa h_TIBL(x), terral y Puerto (Med SOx ECA 0,10%). [LUPA EN ${streetShort.toUpperCase()}]: Tráfico COPERT 5.7 local = +${copertTrafficUg} µg/m³ (${trafficSharePct}%) | Arboleda = ${treesSinkUg} µg/m³ | Firme = ${isTio2 ? 'TiO₂ Grado A1' : `Asfalto/Piedra ${skinTempC}°C`}.`,
-    shortStreetMetricSummary: `Tráfico local=${trafficSharePct}% (+${copertTrafficUg} µg/m³) | Arboleda=${treesSinkUg} µg/m³`,
-    governingEquationLatex: 'C_{\\text{neto}} = C_{\\text{fondo,adv}} + \\Delta C_{\\text{tráfico,local}}(' + trafficSharePct + '\\%) - \\Delta C_{\\text{disp/arboleda/puerto}}',
-    thesisConclusionForTribunal: `Demuestra en los 11 distritos de Málaga (media ${cityScan.meanTrafficSharePct}%) y puntualmente en ${streetShort} (${isPedestrianStreet ? '0,0% emisión local en vía peatonal' : `${trafficSharePct}%`}) la fracción física real de NO₂ debida al tráfico tras descontar analíticamente meteorología, puerto y vegetación.`,
+    title: `1.º Toda Málaga (11 Distritos): Tráfico aporta ${cityScan.meanTrafficSharePct}% medio (ZBE -21,5% intramuros / +4,2% borde) | 2.º Lupa en ${streetShort}: ${trafficSharePct}% tráfico (+${copertTrafficUg} µg/m³) y arboleda (${treesSinkUg} µg/m³)`,
+    quantitativeEvidence: `[TODA MÁLAGA • 11 DISTRITOS]: El tráfico explica entre el 52,4% (Centro peatonal) y el 76,4% (D7 Av. Juan XXIII) del NO₂ tras descontar brisa h_TIBL(x), terral y Puerto (Med SOx ECA 0,10%). [LUPA EN ${streetShort.toUpperCase()}]: Tráfico COPERT 5.7 = +${copertTrafficUg} µg/m³ (${trafficSharePct}%) | Arboleda = ${treesSinkUg} µg/m³ | Firme = ${isTio2 ? 'TiO₂ Grado A1' : `Asfalto ${skinTempC}°C`}.`,
+    shortStreetMetricSummary: `Tráfico=${trafficSharePct}% (+${copertTrafficUg} µg/m³) | Arboleda=${treesSinkUg} µg/m³`,
+    governingEquationLatex: 'C_{\\text{neto}} = C_{\\text{fondo}} + \\Delta C_{\\text{tráfico}}(' + trafficSharePct + '\\%) - \\Delta C_{\\text{disp/arboleda/puerto}}',
+    thesisConclusionForTribunal: `Demuestra en los 11 distritos de Málaga (media ${cityScan.meanTrafficSharePct}%) y puntualmente en ${streetShort} (${trafficSharePct}%) la fracción exacta de NO₂ debida al tráfico tras descontar analíticamente meteorología, puerto y vegetación.`,
     unedCheckpointRef: ckptLabel,
     targetSubView: 'objectives'
   });

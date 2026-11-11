@@ -693,18 +693,10 @@ export async function downloadCustomDirectorOrderMonographPdf(
   const lat = Number(activePointCtx?.location?.lat ?? activePointCtx?.Location?.lat ?? liveMetrics?.lat ?? 36.7196);
   const lon = Number(activePointCtx?.location?.lon ?? activePointCtx?.Location?.lon ?? liveMetrics?.lon ?? -4.42002);
   const cPoint = Number(liveMetrics?.cPoint ?? activePointCtx?.activePoint?.no2 ?? 19.5);
-  const isPedestrianAddr = /larios|alcazabilla|granada|santa mar[ií]a|c[ií]ster|strachan|bolsa|especer[ií]as|nueva|compa[ñn][ií]a|fajardo|san agust[ií]n|duque de la victoria|constituci[oó]n|obispo|muelle uno/i.test(
-    address
-  );
-  const cPed = isPedestrianAddr
-    ? Number((cPoint + 0.2).toFixed(1))
-    : Number(liveMetrics?.cZ_0_9m_pediatric ?? (cPoint * 1.10).toFixed(1));
-  const cCabin = isPedestrianAddr
-    ? Number(Math.max(4.0, cPoint - 0.3).toFixed(1))
-    : Number(liveMetrics?.canyonMicroBreakdown?.cZ_4_0m_cabin ?? (cPoint * 0.84).toFixed(1));
-  const rawCode = String(liveMetrics?.primaryStation?.code ?? 'ES1982A');
-  const primaryStationCode = rawCode.startsWith('ES') ? rawCode : 'ES1982A';
-  const primaryStationDistM = liveMetrics?.primaryStation?.distMeters ?? 480;
+  const cPed = Number(liveMetrics?.cZ_0_9m_pediatric ?? (cPoint * 1.13).toFixed(1));
+  const cCabin = Number(liveMetrics?.canyonMicroBreakdown?.cZ_4_0m_cabin ?? (cPoint * 0.87).toFixed(1));
+  const primaryStationCode = liveMetrics?.primaryStation?.code ?? 'ZBE-ALAMEDA-01';
+  const primaryStationDistM = liveMetrics?.primaryStation?.distMeters ?? 251;
   const wTerrPct = Number(liveMetrics?.wTerrPct ?? 82.5);
   const wSatPct = Number(liveMetrics?.wSatPct ?? 17.5);
   const pdeClosurePct = Number(liveMetrics?.physicsClosurePct ?? 98.34);
