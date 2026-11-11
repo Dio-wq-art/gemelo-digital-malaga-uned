@@ -1,0 +1,8 @@
+{
+  "name": "Gemelo Digital de Calidad del Aire - Málaga",
+  "description": "Gemelo Digital Informado por la Física (Physics-Informed Digital Twin) para la asimilación continua de datos observacionales y modelización determinista de calidad del aire a microescala en Málaga. REGLA DE ORO EN 3 PASOS IMPUESTA SIN OLVIDOS (PARA MEJORAS Y BORRADOS, DE MANERA QUIRÚRGICA Y DOCTORAL): 1) Localización directa del objetivo sin barridos ni lecturas innecesarias; 2) Intervención quirúrgica y doctoral ejecutando exclusivamente la mejora o el borrado delimitado sin tocar nada más; 3) Verificación en 1 segundo validando solo el módulo afectado para disponibilidad inmediata en pantalla sin esperas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

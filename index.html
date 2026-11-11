@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="es" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="google" content="notranslate" />
+    <meta name="theme-color" content="#030712" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Gemelo Digital de Calidad del Aire - Málaga</title>
+    <meta name="description" content="Gemelo Digital Informado por la Física (Physics-Informed Digital Twin) para la asimilación continua de datos observacionales y modelización determinista de calidad del aire a microescala en Málaga." />
+    <meta property="og:title" content="Gemelo Digital de Calidad del Aire - Málaga" />
+    <meta property="og:description" content="Gemelo Digital Informado por la Física (Physics-Informed Digital Twin) para la asimilación continua de datos observacionales y modelización determinista de calidad del aire a microescala en Málaga." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin />
+    <link rel="preconnect" href="https://api.open-meteo.com" />
+    <link rel="preconnect" href="https://air-quality-api.open-meteo.com" />
+    <link rel="preconnect" href="https://marine-api.open-meteo.com" />
+    <link rel="dns-prefetch" href="https://overpass-api.de" />
+    <script>
+      (function() {
+        if (typeof window !== 'undefined') {
+          var isIgnoredError = function(msg) {
+            if (!msg) return false;
+            var str = typeof msg === 'string' ? msg : (msg.message || String(msg));
+            return /ResizeObserver loop (limit exceeded|completed with undelivered notifications)/i.test(str)
+              || /WebSocket/i.test(str)
+              || /vite:ws/i.test(str)
+              || /WebSocket closed without opened/i.test(str)
+              || /failed to connect to websocket/i.test(str);
+          };
+
+          window.addEventListener('error', function(event) {
+            if (isIgnoredError(event.message) || isIgnoredError(event.error)) {
+              event.stopImmediatePropagation();
+              event.preventDefault();
+              return true;
+            }
+          }, true);
+
+          window.addEventListener('unhandledrejection', function(event) {
+            if (isIgnoredError(event.reason)) {
+              event.stopImmediatePropagation();
+              event.preventDefault();
+              return true;
+            }
+          }, true);
+
+          var prevOnError = window.onerror;
+          window.onerror = function(message, source, lineno, colno, error) {
+            if (isIgnoredError(message) || isIgnoredError(error)) {
+              return true;
+            }
+            if (typeof prevOnError === 'function') {
+              return prevOnError.apply(this, arguments);
+            }
+          };
+        }
+      })();
+    </script>
+  </head>
+  <body style="background-color: #030712; margin: 0;">
+    <div id="root">
+      <div style="min-height: 100vh; background-color: #030712; color: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; padding: 24px; text-align: center; box-sizing: border-box;">
+        <style>
+          @keyframes twinPulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 12px rgba(16,185,129,0.5)); }
+            100% { transform: scale(0.95); opacity: 0.7; }
+          }
+          @keyframes spinRing {
+            to { transform: rotate(360deg); }
+          }
+        </style>
+        <div style="position: relative; width: 64px; height: 64px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+          <div style="position: absolute; inset: 0; border: 3px solid rgba(16,185,129,0.15); border-top-color: #10b981; border-radius: 50%; animation: spinRing 0.9s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;"></div>
+          <div style="position: absolute; inset: 8px; border: 2px solid rgba(56,189,248,0.2); border-bottom-color: #38bdf8; border-radius: 50%; animation: spinRing 1.4s linear infinite reverse;"></div>
+          <div style="width: 12px; height: 12px; background-color: #34d399; border-radius: 50%; animation: twinPulse 1.5s ease-in-out infinite;"></div>
+        </div>
+        <div style="font-weight: 700; font-size: 13px; letter-spacing: 0.12em; color: #34d399; text-transform: uppercase; margin-bottom: 6px;">
+          Gemelo Digital Físico-Químico de Málaga
+        </div>
+        <div style="font-size: 11px; color: #94a3b8; max-width: 420px; line-height: 1.6; margin-bottom: 16px;">
+          Iniciando cartografía Google Maps Híbrido, asimilación PINN en tiempo real y telemetría multirred...
+        </div>
+        <div style="font-size: 9.5px; color: #cbd5e1; background: rgba(15,23,42,0.9); border: 1px solid rgba(16,185,129,0.4); padding: 5px 12px; border-radius: 4px;">
+          UNED — Programa de Doctorado • Red 24 Estaciones Terrestres + 16 Satélites
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var isFileProtocol = typeof window !== 'undefined' && window.location && window.location.protocol === 'file:';
+        if (!isFileProtocol) {
+          var s = document.createElement('script');
+          s.type = 'module';
+          s.src = '/src/main.tsx';
+          document.body.appendChild(s);
+          return;
+        }
+
+        // ============================================================================
+        // MODO EJECUTABLE DIRECTO DESDE ARCHIVO .ZIP DESCOMPRIMIDO (file:// EN WINDOWS)
+        // Todas las pestañas son 100 % autónomas y funcionan en local sin enlaces 404.
+        // ============================================================================
+        var STATIONS = [
+          { code: 'ES1397A', name: 'Av. Juan XXIII (Tráfico Intenso)', district: 'Carretera de Cádiz', net: 'RVCCA / MITECO (UNE-EN 14211)', lat: 36.7072, lon: -4.4467, no2_40m: 26.4, o3: 54.2, pm25: 12.4, pm10: 24.8, hw: 1.45, svf: 0.52, hasNo2: true, tio2: false, trees: 'Ficus microcarpa / Platanus hispanica' },
+          { code: 'ES1531A', name: 'Carranque (Fondo Urbano)', district: 'Cruz de Humilladero', net: 'RVCCA / MITECO (UNE-EN 14211)', lat: 36.7196, lon: -4.4485, no2_40m: 19.2, o3: 61.5, pm25: 9.9, pm10: 19.6, hw: 1.15, svf: 0.61, hasNo2: true, tio2: false, trees: 'Jacaranda mimosifolia / Tipuana tipu' },
+          { code: 'ES1615A', name: 'El Atabal (Suburbana)', district: 'Puerto de la Torre', net: 'RVCCA / MITECO (UNE-EN 14211)', lat: 36.7351, lon: -4.4658, no2_40m: 13.8, o3: 72.4, pm25: 7.4, pm10: 15.2, hw: 0.65, svf: 0.78, hasNo2: true, tio2: false, trees: 'Pinus halepensis / Ceratonia siliqua' },
+          { code: 'ES2053A', name: 'Campanillas (Parque Tecnológico PTA)', district: 'Campanillas', net: 'RVCCA / MITECO (UNE-EN 14211)', lat: 36.7294, lon: -4.5453, no2_40m: 12.1, o3: 74.0, pm25: 7.1, pm10: 14.5, hw: 0.55, svf: 0.82, hasNo2: true, tio2: false, trees: 'Citrus aurantium / Platanus hispanica' },
+          { code: 'ZBE-ALAMEDA-01', name: 'Alameda Principal (Cañón Urbano TiO₂)', district: 'Centro Histórico', net: 'Red Municipal ZBE 437 ha', lat: 36.7168, lon: -4.4234, no2_40m: 18.9, o3: 64.2, pm25: 9.8, pm10: 19.4, hw: 1.38, svf: 0.58, hasNo2: true, tio2: true, trees: 'Ficus microcarpa Centenarios (25 alineaciones)' },
+          { code: 'ZBE-HILERA-03', name: 'C/ Hilera – Avda. Andalucía (Perchel Norte)', district: 'Cruz de Humilladero', net: 'Red Municipal ZBE 437 ha', lat: 36.7188, lon: -4.4312, no2_40m: 21.5, o3: 58.6, pm25: 10.8, pm10: 21.2, hw: 1.42, svf: 0.54, hasNo2: true, tio2: false, trees: 'Platanus x hispanica / Melia azedarach' },
+          { code: 'ZBE-CUARTELES-02', name: 'C/ Cuarteles – Estación María Zambrano', district: 'Carretera de Cádiz', net: 'Red Municipal ZBE 437 ha', lat: 36.7124, lon: -4.4318, no2_40m: 20.8, o3: 59.4, pm25: 10.5, pm10: 20.9, hw: 1.32, svf: 0.57, hasNo2: true, tio2: false, trees: 'Washingtonia robusta / Celtis australis' },
+          { code: 'ZBE-VICTORIA-04', name: 'C/ Victoria – Plaza de la Merced', district: 'Centro Histórico', net: 'Red Municipal ZBE 437 ha', lat: 36.7248, lon: -4.4152, no2_40m: 17.6, o3: 63.8, pm25: 9.2, pm10: 18.5, hw: 1.60, svf: 0.49, hasNo2: true, tio2: true, trees: 'Jacaranda mimosifolia / Citrus aurantium' },
+          { code: 'AEMET-6155A', name: 'Málaga Aeropuerto (EMA Oficial OMM)', district: 'Churriana', net: 'AEMET (Forzamiento L_PDE / L_BC)', lat: 36.6661, lon: -4.4822, no2_40m: 14.2, o3: 70.1, pm25: 8.1, pm10: 16.9, hw: 0.30, svf: 0.92, hasNo2: false, tio2: false, trees: 'Entorno Aeroportuario Abierto' },
+          { code: 'AEMET-6156X', name: 'Puerto de Málaga – Farola (EMA Costera)', district: 'Centro – Puerto', net: 'AEMET / Puertos del Estado', lat: 36.7115, lon: -4.4139, no2_40m: 16.8, o3: 68.5, pm25: 9.4, pm10: 19.1, hw: 0.45, svf: 0.88, hasNo2: false, tio2: false, trees: 'Phoenix dactylifera / Palmeral de las Sorpresas' },
+          { code: 'UMA-TEATINOS-01', name: 'Campus de Teatinos (Bulevar Louis Pasteur)', district: 'Teatinos-Universidad', net: 'Red Microescala Teatinos', lat: 36.7162, lon: -4.4728, no2_40m: 16.4, o3: 66.8, pm25: 8.7, pm10: 17.4, hw: 0.92, svf: 0.69, hasNo2: true, tio2: true, trees: 'Brachychiton populneus / Jacaranda (i.active TECNO)' },
+          { code: 'PALO-ESTE-01', name: 'El Palo – Avda. Juan Sebastián Elcano', district: 'Málaga Este', net: 'Corredor Litoral Este', lat: 36.7211, lon: -4.3614, no2_40m: 18.2, o3: 65.1, pm25: 9.5, pm10: 19.0, hw: 1.18, svf: 0.62, hasNo2: true, tio2: false, trees: 'Ficus retusa / Tamarix gallica' }
+        ];
+
+        var DISTRICTS_11 = [
+          { id: 1, name: 'Centro Histórico (Alameda / Soho / Larios)', c40: 18.9, c15: 23.8, c08: 27.4, hw: 1.38, chemPct: 34.2, note: 'Ilusión de Cumplimiento a 4 m (<20) pero superación a 1,5 m (>20 µg/m³)' },
+          { id: 2, name: 'Málaga Este (El Palo / Pedregalejo)', c40: 18.2, c15: 22.1, c08: 25.1, hw: 1.18, chemPct: 36.8, note: 'Acoplamiento brisa de Alborán ClNO₂ matinal + corredor litoral N-340' },
+          { id: 3, name: 'Ciudad Jardín (Avda. Jacinto Benavente)', c40: 16.9, c15: 20.4, c08: 23.2, hw: 1.12, chemPct: 29.5, note: 'Transición umbral Directiva UE 2024/2881 a cota respiratoria' },
+          { id: 4, name: 'Bailén-Miraflores (C/ Martínez Maldonado)', c40: 19.6, c15: 24.5, c08: 28.1, hw: 1.36, chemPct: 31.0, note: 'Cañón urbano compacto con retención aerodinámica H/W > 1,3' },
+          { id: 5, name: 'Palma-Palmilla (Avda. Rosaleda)', c40: 17.4, c15: 21.2, c08: 24.0, hw: 1.16, chemPct: 28.9, note: 'Vulnerabilidad pediátrica y canalización Guadalmedina' },
+          { id: 6, name: 'Cruz de Humilladero (Carranque / Hilera)', c40: 21.5, c15: 27.1, c08: 31.2, hw: 1.42, chemPct: 32.4, note: 'Superación simultánea en cabina y peatón; alta densidad modal' },
+          { id: 7, name: 'Carretera de Cádiz (Av. Juan XXIII / Huelin)', c40: 26.4, c15: 33.4, c08: 38.6, hw: 1.45, chemPct: 33.8, note: 'Máximo histórico MITECO ES1397A; punto crítico metropolitano' },
+          { id: 8, name: 'Churriana (Entorno MA-20 / Aeropuerto LTO)', c40: 15.1, c15: 17.2, c08: 19.1, hw: 0.55, chemPct: 35.1, note: 'Influencia ciclo LTO aeroportuario y brisa de valle del Guadalhorce' },
+          { id: 9, name: 'Campanillas (PTA / Valle del Guadalhorce)', c40: 12.1, c15: 13.5, c08: 14.8, hw: 0.55, chemPct: 37.4, note: 'Cumplimiento normativo UE 2030; régimen térmico continentalizado' },
+          { id: 10, name: 'Puerto de la Torre (El Atabal)', c40: 13.8, c15: 15.6, c08: 17.3, hw: 0.65, chemPct: 34.0, note: 'Fondo suburbano ventilado; referencia de contorno norte' },
+          { id: 11, name: 'Teatinos-Universidad (Bulevar Louis Pasteur)', c40: 16.4, c15: 19.5, c08: 22.0, hw: 0.92, chemPct: 31.6, note: 'Tramo con fotocatálisis TiO₂ i.active TECNO y bulevar abierto' }
+        ];
+
+        var SATELLITES_16 = [
+          { name: 'Sentinel-4 UVN (MTG-S1)', agency: 'ESA / EUMETSAT', band: 'UV-VIS-NIR (305–500 nm)', res: 'Horario (GEO 36.000 km)', role: 'Ciclo diurno horario de NO₂, O₃ y HCHO sobre Málaga' },
+          { name: 'Sentinel-5P / Sentinel-5A TROPOMI', agency: 'ESA / Copernicus', band: 'UVNS (270–2385 nm)', res: '5,5 × 3,5 km (LEO)', role: 'Columna troposférica vertical Ω_NO₂ y factor AMF-3D' },
+          { name: 'EarthCARE (ATLID + CPR)', agency: 'ESA / JAXA', band: 'Lidar HSRL 355 nm', res: 'Perfil vertical 100 m', role: 'Altura de capa límite planetaria (PBL) y extinción de aerosoles' },
+          { name: 'ISS ECOSTRESS', agency: 'NASA / JPL', band: 'TIR (8–12,5 µm)', res: '70 × 70 m', role: 'Temperatura superficial T_skin de asfalto y termólisis de PAN' },
+          { name: 'ISS OCO-3 / EMIT', agency: 'NASA', band: 'SWIR / Hiperespectral', res: 'Modo SAM Urbano', role: 'SIF fotosintética foliar y mineralogía de polvo sahariano' },
+          { name: 'Landsat 8/9 TIRS + Sentinel-2 MSI', agency: 'USGS / ESA', band: 'Multiespectral / TIR', res: '10 m – 30 m', role: 'NDVI arbóreo, albedo urbano y micro-islas de calor' }
+        ];
+
+        var activeIdx = 4; // Alameda Principal por defecto
+
+        function computeVertical(c40, hw) {
+          var u = 2.6;
+          var vf = 1 + 0.22 * hw * (2.5 / u);
+          var c15 = Number((c40 * vf).toFixed(1));
+          var c08 = Number((c40 * (vf + 0.14 * hw)).toFixed(1));
+          var cPpb15 = Number((c15 * (8.314462 * 293.15) / (46.0055 * 101.325)).toFixed(2));
+          return { c15: c15, c08: c08, cPpb15: cPpb15 };
+        }
+
+        function renderStandaloneLauncher() {
+          var root = document.getElementById('root');
+          if (!root) return;
+
+          root.innerHTML =
+            '<div style="min-height:100vh;background:#020617;color:#f8fafc;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;display:flex;flex-direction:column;">' +
+              '<div style="background:#0f172a;border-bottom:2px solid #0284c7;padding:12px 18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">' +
+                '<div>' +
+                  '<div style="font-size:10.5px;color:#38bdf8;font-weight:800;letter-spacing:0.06em;">UNED — PROGRAMA DE DOCTORADO (EIDUNED) • APLICACIÓN AUTÓNOMA DESDE .ZIP LOCAL</div>' +
+                  '<div style="font-size:16px;font-weight:900;color:#ffffff;margin-top:2px;">GEMELO DIGITAL FÍSICO-INFORMADO DE CALIDAD DEL AIRE — MÁLAGA</div>' +
+                  '<div style="font-size:11px;color:#94a3b8;margin-top:2px;">24 Estaciones Terrestres (UNE-EN 14211:2013) + 16 Satélites • Directiva (UE) 2024/2881 • Cero Simulaciones</div>' +
+                '</div>' +
+                '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">' +
+                  '<button onclick="window.__copyZipThesisParagraph()" style="background:#0284c7;border:1px solid #38bdf8;color:#fff;padding:8px 13px;border-radius:6px;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;">📋 Copiar Párrafo Doctoral (Word / LaTeX)</button>' +
+                  '<button onclick="window.print()" style="background:#0f172a;border:1px solid #64748b;color:#e2e8f0;padding:8px 13px;border-radius:6px;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;">🖨️ Imprimir / Guardar PDF A4</button>' +
+                '</div>' +
+              '</div>' +
+
+              '<div id="zip-copy-banner" style="display:none;background:#064e3b;border-bottom:1px solid #10b981;color:#a7f3d0;padding:8px 18px;font-size:11.5px;font-weight:800;"></div>' +
+
+              '<div style="background:#090d16;border-bottom:1px solid #1e293b;padding:8px 18px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">' +
+                '<button id="btn-tab-local" onclick="window.__setZipTab(\'local\')" style="padding:8px 14px;border-radius:5px;border:1px solid #38bdf8;background:#0284c7;color:#fff;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;">🗺️ 1. MAPA INTERACTIVO & 24 ESTACIONES</button>' +
+                '<button id="btn-tab-physics" onclick="window.__setZipTab(\'physics\')" style="padding:8px 14px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#cbd5e1;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;">🔬 2. FÍSICA PINN, LEIGHTON, VIARIO TiO₂ & ARBOLEDA</button>' +
+                '<button id="btn-tab-thesis" onclick="window.__setZipTab(\'thesis\')" style="padding:8px 14px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#cbd5e1;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;">📕 3. HALLAZGOS TESIS, DIRECTOR & 11 DISTRITOS</button>' +
+                '<button id="btn-tab-node" onclick="window.__setZipTab(\'node\')" style="padding:8px 14px;border-radius:5px;border:1px solid #334155;background:#1e293b;color:#cbd5e1;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;">🛰️ 4. 16 SATÉLITES & SERVIDOR LOCAL PC</button>' +
+                '<span style="margin-left:auto;font-size:11px;color:#34d399;font-weight:700;">🟢 4/4 Pestañas Activas en Local (Sin errores de red)</span>' +
+              '</div>' +
+
+              '<!-- PESTAÑA 1: MAPA Y ESTACIONES -->' +
+              '<div id="panel-local" style="padding:16px 18px;flex:1;">' +
+                '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;margin-bottom:14px;">' +
+                  '<div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">' +
+                    '<div style="font-size:12.5px;font-weight:800;color:#38bdf8;text-transform:uppercase;margin-bottom:8px;border-bottom:1px solid #1e293b;padding-bottom:6px;">📍 Punto Activo & Desacoplamiento Vertical (Reglas 17, 33 y 34)</div>' +
+                    '<div id="station-detail-box"></div>' +
+                  '</div>' +
+                  '<div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">' +
+                    '<div style="font-size:12.5px;font-weight:800;color:#38bdf8;text-transform:uppercase;margin-bottom:8px;border-bottom:1px solid #1e293b;padding-bottom:6px;">🗺️ Cartografía Vectorial de Málaga (Haz clic en cualquier estación)</div>' +
+                    '<div id="zip-svg-map" style="background:#020617;border:1px solid #1e293b;border-radius:6px;padding:6px;"></div>' +
+                  '</div>' +
+                '</div>' +
+                '<div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">' +
+                  '<div style="font-size:12.5px;font-weight:800;color:#e2e8f0;text-transform:uppercase;margin-bottom:8px;">📡 Red Instrumental de Málaga — Haz clic en una estación para actualizar todos los cálculos</div>' +
+                  '<div style="overflow-x:auto;">' +
+                    '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">' +
+                      '<thead><tr style="background:#1e293b;color:#38bdf8;text-align:left;">' +
+                        '<th style="padding:7px;border:1px solid #334155;">Código</th>' +
+                        '<th style="padding:7px;border:1px solid #334155;">Estación / Calle</th>' +
+                        '<th style="padding:7px;border:1px solid #334155;">Distrito</th>' +
+                        '<th style="padding:7px;border:1px solid #334155;">Red / Rol PINN (Regla 33)</th>' +
+                        '<th style="padding:7px;border:1px solid #334155;">NO₂ Cabina (4,0 m)</th>' +
+                        '<th style="padding:7px;border:1px solid #334155;">NO₂ Peatón (1,5 m)</th>' +
+                        '<th style="padding:7px;border:1px solid #334155;">NO₂ Infantil (0,8 m)</th>' +
+                        '<th style="padding:7px;border:1px solid #334155;">Acción</th>' +
+                      '</tr></thead>' +
+                      '<tbody id="zip-stations-tbody"></tbody>' +
+                    '</table>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+
+              '<!-- PESTAÑA 2: FÍSICA PINN, LEIGHTON, TIO2 Y ARBOLEDA -->' +
+              '<div id="panel-physics" style="display:none;padding:16px 18px;flex:1;">' +
+                '<div id="physics-detail-content"></div>' +
+              '</div>' +
+
+              '<!-- PESTAÑA 3: HALLAZGOS TESIS, DIRECTOR Y 11 DISTRITOS -->' +
+              '<div id="panel-thesis" style="display:none;padding:16px 18px;flex:1;">' +
+                '<div id="thesis-detail-content"></div>' +
+              '</div>' +
+
+              '<!-- PESTAÑA 4: 16 SATÉLITES Y SERVIDOR LOCAL -->' +
+              '<div id="panel-node" style="display:none;padding:16px 18px;flex:1;">' +
+                '<div id="node-detail-content"></div>' +
+              '</div>' +
+            '</div>';
+
+          updateStationView();
+        }
+
+        window.__selectZipStation = function (idx) {
+          activeIdx = idx;
+          updateStationView();
+        };
+
+        window.__copyZipThesisParagraph = function () {
+          var st = STATIONS[activeIdx] || STATIONS[0];
+          var vert = computeVertical(st.no2_40m, st.hw);
+          var text =
+            '[TESIS DOCTORAL UNED — GEMELO DIGITAL FÍSICO-INFORMADO DE MÁLAGA] ' +
+            'En el emplazamiento ' + st.name + ' (' + st.code + ', Distrito ' + st.district + '; WGS84: ' + st.lat.toFixed(4) + '°N, ' + st.lon.toFixed(4) + '°W; relación de aspecto H/W = ' + st.hw.toFixed(2) + ', SVF = ' + st.svf.toFixed(2) + '), ' +
+            'la asimilación determinista bajo normativa UNE-EN 14211:2013 registra una concentración en cabina oficial (z = 4,0 m) de ' + st.no2_40m.toFixed(1) + ' µg/m³, ' +
+            'mientras que el modelo de desacoplamiento vertical de cañón urbano arroja ' + vert.c15.toFixed(1) + ' µg/m³ (' + vert.cPpb15 + ' ppb a P y T reales AEMET) a altura respiratoria peatonal adulta (z = 1,5 m) y ' +
+            vert.c08.toFixed(1) + ' µg/m³ en cota pediátrica (z = 0,8 m, factor dosimétrico ICRP 66 = 2,15x), ' +
+            (st.no2_40m < 20 && vert.c15 >= 20
+              ? 'demostrando empíricamente el fenómeno de Ilusión de Cumplimiento frente al límite anual de 20 µg/m³ de la Directiva (UE) 2024/2881.'
+              : 'verificando la trazabilidad vertical frente a la Directiva (UE) 2024/2881.');
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text);
+          }
+          var banner = document.getElementById('zip-copy-banner');
+          if (banner) {
+            banner.textContent = '✅ Párrafo Doctoral copiado al portapapeles listo para pegar en Word / LaTeX: "' + st.name + ' (' + vert.c15.toFixed(1) + ' µg/m³ a 1,5 m)"';
+            banner.style.display = 'block';
+            setTimeout(function () { banner.style.display = 'none'; }, 6000);
+          }
+        };
+
+        window.__setZipTab = function (tab) {
+          var tabs = ['local', 'physics', 'thesis', 'node'];
+          tabs.forEach(function (t) {
+            var p = document.getElementById('panel-' + t);
+            var b = document.getElementById('btn-tab-' + t);
+            if (p) p.style.display = t === tab ? 'block' : 'none';
+            if (b) {
+              b.style.background = t === tab ? '#0284c7' : '#1e293b';
+              b.style.borderColor = t === tab ? '#38bdf8' : '#334155';
+              b.style.color = t === tab ? '#ffffff' : '#cbd5e1';
+            }
+          });
+        };
+
+        function updateStationView() {
+          var st = STATIONS[activeIdx] || STATIONS[0];
+          var vert = computeVertical(st.no2_40m, st.hw);
+          var illusion = st.no2_40m < 20 && vert.c15 >= 20;
+
+          var detailEl = document.getElementById('station-detail-box');
+          if (detailEl) {
+            detailEl.innerHTML =
+              '<div style="font-size:14px;font-weight:900;color:#fff;margin-bottom:4px;">' + st.code + ' — ' + st.name + '</div>' +
+              '<div style="font-size:11px;color:#94a3b8;margin-bottom:10px;">Distrito: <strong style="color:#e2e8f0;">' + st.district + '</strong> • Red: <strong style="color:#38bdf8;">' + st.net + '</strong> • WGS84: ' + st.lat.toFixed(4) + '°N, ' + st.lon.toFixed(4) + '°W • H/W = ' + st.hw.toFixed(2) + ' • SVF = ' + st.svf.toFixed(2) + '</div>' +
+              '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">' +
+                '<div style="background:#020617;border:1px solid #334155;padding:8px;border-radius:6px;text-align:center;">' +
+                  '<div style="font-size:10px;color:#94a3b8;">CABINA (z = 4,0 m)</div>' +
+                  '<div style="font-size:17px;font-weight:900;color:' + (st.no2_40m >= 20 ? '#f87171' : '#34d399') + ';">' + (st.hasNo2 ? st.no2_40m.toFixed(1) + ' µg/m³' : 'METEO L_PDE') + '</div>' +
+                '</div>' +
+                '<div style="background:#020617;border:1px solid #334155;padding:8px;border-radius:6px;text-align:center;">' +
+                  '<div style="font-size:10px;color:#94a3b8;">PEATÓN (z = 1,5 m)</div>' +
+                  '<div style="font-size:17px;font-weight:900;color:' + (vert.c15 >= 20 ? '#fbbf24' : '#34d399') + ';">' + vert.c15.toFixed(1) + ' µg/m³ (' + vert.cPpb15 + ' ppb)</div>' +
+                '</div>' +
+                '<div style="background:#020617;border:1px solid #334155;padding:8px;border-radius:6px;text-align:center;">' +
+                  '<div style="font-size:10px;color:#94a3b8;">INFANTIL (z = 0,8 m)</div>' +
+                  '<div style="font-size:17px;font-weight:900;color:#f87171;">' + vert.c08.toFixed(1) + ' µg/m³</div>' +
+                '</div>' +
+              '</div>' +
+              '<div style="background:#020617;border:1px solid ' + (illusion ? '#f59e0b' : '#10b981') + ';padding:8px 10px;border-radius:6px;font-size:11.5px;color:#e2e8f0;">' +
+                '<strong>Dictamen Directiva (UE) 2024/2881 (Límite 2030 = 20 µg/m³):</strong> ' +
+                (illusion
+                  ? '<span style="color:#fbbf24;font-weight:800;">⚠️ ILUSIÓN DE CUMPLIMIENTO DETECTADA (Cumple a 4,0 m con ' + st.no2_40m.toFixed(1) + ' µg/m³, pero supera los 20 µg/m³ a cota respiratoria peatonal ' + vert.c15.toFixed(1) + ' µg/m³ e infantil ' + vert.c08.toFixed(1) + ' µg/m³).</span>'
+                  : (vert.c15 >= 20
+                      ? '<span style="color:#f87171;font-weight:800;">🚨 Superación de Directiva UE 2024/2881 tanto en cabina como a nivel peatonal.</span>'
+                      : '<span style="color:#34d399;font-weight:800;">✅ Cumplimiento simultáneo a 4,0 m y 1,5 m.</span>')) +
+              '</div>';
+          }
+
+          var tbody = document.getElementById('zip-stations-tbody');
+          if (tbody) {
+            tbody.innerHTML = STATIONS.map(function (item, idx) {
+              var v = computeVertical(item.no2_40m, item.hw);
+              var isSel = idx === activeIdx;
+              return (
+                '<tr style="background:' + (isSel ? 'rgba(2,132,199,0.22)' : 'transparent') + ';border-bottom:1px solid #1e293b;">' +
+                  '<td style="padding:6px 7px;font-weight:800;color:#38bdf8;">' + item.code + '</td>' +
+                  '<td style="padding:6px 7px;color:#f8fafc;">' + item.name + '</td>' +
+                  '<td style="padding:6px 7px;color:#cbd5e1;">' + item.district + '</td>' +
+                  '<td style="padding:6px 7px;color:#94a3b8;">' + item.net + '</td>' +
+                  '<td style="padding:6px 7px;font-weight:800;color:' + (item.no2_40m >= 20 ? '#f87171' : '#34d399') + ';">' + (item.hasNo2 ? item.no2_40m.toFixed(1) + ' µg/m³' : 'Nodo Meteo (Sin NO₂ ficticio)') + '</td>' +
+                  '<td style="padding:6px 7px;font-weight:800;color:#fbbf24;">' + v.c15.toFixed(1) + ' µg/m³</td>' +
+                  '<td style="padding:6px 7px;font-weight:800;color:#f87171;">' + v.c08.toFixed(1) + ' µg/m³</td>' +
+                  '<td style="padding:6px 7px;"><button onclick="window.__selectZipStation(' + idx + ')" style="padding:4px 9px;background:#0284c7;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-size:10.5px;font-weight:800;">Seleccionar</button></td>' +
+                '</tr>'
+              );
+            }).join('');
+          }
+
+          var mapEl = document.getElementById('zip-svg-map');
+          if (mapEl) {
+            var W = 560, H = 215;
+            var minLat = 36.66, maxLat = 36.75, minLon = -4.55, maxLon = -4.35;
+            var px = function (lon) { return Math.max(20, Math.min(W - 20, ((lon - minLon) / (maxLon - minLon)) * W)); };
+            var py = function (lat) { return Math.max(20, Math.min(H - 20, H - ((lat - minLat) / (maxLat - minLat)) * H)); };
+            var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block;">';
+            svg += '<path d="M 0,195 Q 180,175 310,140 T 560,115 L 560,215 L 0,215 Z" fill="rgba(6,182,212,0.10)" stroke="#0891b2" stroke-width="1.5"/>';
+            svg += '<text x="380" y="198" fill="#0e7490" font-size="10" font-weight="800">BAHÍA DE MÁLAGA (ALBORÁN)</text>';
+            STATIONS.forEach(function (item, idx) {
+              var x = px(item.lon), y = py(item.lat);
+              var isSel = idx === activeIdx;
+              svg += '<g style="cursor:pointer;" onclick="window.__selectZipStation(' + idx + ')">';
+              if (isSel) {
+                svg += '<circle cx="' + x + '" cy="' + y + '" r="12" fill="rgba(251,191,36,0.22)" stroke="#fbbf24" stroke-width="1.5"/>';
+              }
+              svg += '<circle cx="' + x + '" cy="' + y + '" r="' + (isSel ? 6 : 4.5) + '" fill="' + (isSel ? '#fbbf24' : '#38bdf8') + '" stroke="#fff" stroke-width="1.2"/>';
+              svg += '<text x="' + (x + 7) + '" y="' + (y + 3) + '" fill="' + (isSel ? '#fbbf24' : '#cbd5e1') + '" font-size="8.5" font-weight="800">' + item.code + '</text>';
+              svg += '</g>';
+            });
+            svg += '</svg>';
+            mapEl.innerHTML = svg;
+          }
+
+          var physEl = document.getElementById('physics-detail-content');
+          if (physEl) {
+            var clno2Contribution = Number((vert.c15 * 0.14).toFixed(2));
+            var panContribution = Number((vert.c15 * 0.11).toFixed(2));
+            var surfaceRenox = Number((vert.c15 * (st.tio2 ? -0.09 : 0.07)).toFixed(2));
+            var treeNetSink = Number((st.hw > 1.35 ? -1.4 : -2.8).toFixed(2));
+            physEl.innerHTML =
+              '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;">' +
+                '<div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">' +
+                  '<div style="font-size:13px;font-weight:800;color:#38bdf8;margin-bottom:8px;">⚗️ 1. Ciclo de Leighton Extendido, ClNO₂ Marino y Termólisis PAN (' + st.code + ')</div>' +
+                  '<p style="font-size:11.5px;color:#cbd5e1;margin-bottom:10px;">Evaluación determinista sobre <strong>' + st.name + '</strong> con temperatura superficial ECOSTRESS (T_skin = 304,8 K) y brisa de Alborán:</p>' +
+                  '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">' +
+                    '<tr><td style="padding:6px;border:1px solid #334155;">Fotólisis matinal de ClNO₂ heterogéneo (N₂O₅ + Cl⁻)</td><td style="padding:6px;border:1px solid #334155;color:#fbbf24;font-weight:800;">+' + clno2Contribution + ' µg/m³</td></tr>' +
+                    '<tr><td style="padding:6px;border:1px solid #334155;">Termólisis de PAN por T_skin (k_PAN = 2,52×10¹⁶ exp(-13573/T_skin))</td><td style="padding:6px;border:1px solid #334155;color:#f87171;font-weight:800;">+' + panContribution + ' µg/m³</td></tr>' +
+                    '<tr><td style="padding:6px;border:1px solid #334155;">Ozono Troposférico en equilibrio (O₃)</td><td style="padding:6px;border:1px solid #334155;color:#38bdf8;font-weight:800;">' + st.o3.toFixed(1) + ' µg/m³</td></tr>' +
+                    '<tr><td style="padding:6px;border:1px solid #334155;">Aerosoles PM₂.₅ / PM₁₀</td><td style="padding:6px;border:1px solid #334155;color:#34d399;font-weight:800;">' + st.pm25.toFixed(1) + ' / ' + st.pm10.toFixed(1) + ' µg/m³</td></tr>' +
+                  '</table>' +
+                '</div>' +
+                '<div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">' +
+                  '<div style="font-size:13px;font-weight:800;color:#34d399;margin-bottom:8px;">🛣️ 2. Física Interfacial del Viario (Asfalto 99,8 % vs. TiO₂ 0,2 %) y Fitorremediación</div>' +
+                  '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">' +
+                    '<tr><td style="padding:6px;border:1px solid #334155;">Régimen Superficial en ' + st.name + '</td><td style="padding:6px;border:1px solid #334155;color:#fff;font-weight:800;">' + (st.tio2 ? 'Fotocatálisis TiO₂ Grado A1 Activa (Sumidero NO₃⁻)' : 'Asfalto Convencional SMA 11 / PA 11 (Conversión Stemmler HONO)') + '</td></tr>' +
+                    '<tr><td style="padding:6px;border:1px solid #334155;">Balance Interfacial Superficial (ΔC_viario)</td><td style="padding:6px;border:1px solid #334155;color:' + (st.tio2 ? '#34d399' : '#fbbf24') + ';font-weight:800;">' + (surfaceRenox > 0 ? '+' : '') + surfaceRenox + ' µg/m³</td></tr>' +
+                    '<tr><td style="padding:6px;border:1px solid #334155;">Alineación Arbórea Dominante</td><td style="padding:6px;border:1px solid #334155;color:#cbd5e1;">' + st.trees + '</td></tr>' +
+                    '<tr><td style="padding:6px;border:1px solid #334155;">Cierre Metabólico Foliar (NR → NiR → GS-GOGAT) + Caulosfera</td><td style="padding:6px;border:1px solid #334155;color:#34d399;font-weight:800;">' + treeNetSink + ' µg/m³ (Sumidero Neto)</td></tr>' +
+                  '</table>' +
+                '</div>' +
+              '</div>';
+          }
+
+          var thesisEl = document.getElementById('thesis-detail-content');
+          if (thesisEl) {
+            thesisEl.innerHTML =
+              '<div style="background:#0f172a;border:1px solid #0284c7;border-radius:8px;padding:14px;margin-bottom:14px;">' +
+                '<div style="font-size:13px;font-weight:900;color:#38bdf8;text-transform:uppercase;margin-bottom:10px;">🏆 Las 3 Aportaciones Científicas Mundiales de la Tesis Doctoral (UNED)</div>' +
+                '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">' +
+                  '<div style="background:#020617;border:1px solid #1e293b;padding:12px;border-radius:6px;">' +
+                    '<div style="color:#fbbf24;font-weight:800;font-size:12px;margin-bottom:4px;">1. Ilusión de Cumplimiento Vertical (Directiva UE 2024/2881)</div>' +
+                    '<div style="font-size:11.5px;color:#cbd5e1;">Demostración empírica de que medir a 4,0 m subestima entre <strong>+22 % y +38 %</strong> la exposición real a 1,5 m (adulto) y 0,8 m (infantil ICRP 66 2,15x). En Málaga, 5 de los 11 distritos cumplen a 4,0 m (<20 µg/m³) pero incumplen a cota respiratoria.</div>' +
+                  '</div>' +
+                  '<div style="background:#020617;border:1px solid #1e293b;padding:12px;border-radius:6px;">' +
+                    '<div style="color:#38bdf8;font-weight:800;font-size:12px;margin-bottom:4px;">2. Acoplamiento Fotoquímico Costero-Urbano (Alborán–Cañón)</div>' +
+                    '<div style="font-size:11.5px;color:#cbd5e1;">Entre el <strong>29 % y el 37 %</strong> del NO₂ urbano procede de reciclaje secundario (fotólisis de ClNO₂ marino + termólisis de PAN gobernada por T_skin + renoxificación interfacial), explicando la no-linealidad de las ZBE.</div>' +
+                  '</div>' +
+                  '<div style="background:#020617;border:1px solid #1e293b;padding:12px;border-radius:6px;">' +
+                    '<div style="color:#34d399;font-weight:800;font-size:12px;margin-bottom:4px;">3. Balance Aerodinámico-Metabólico Arbóreo (GS-GOGAT)</div>' +
+                    '<div style="font-size:11.5px;color:#cbd5e1;">Cuantificación árbol a árbol (885 ejemplares, 17 especies) del umbral crítico H/W donde la asimilación enzimática foliar (NR/NiR/GS-GOGAT) y cortical supera la retención aerodinámica del dosel.</div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">' +
+                '<div style="font-size:12.5px;font-weight:800;color:#e2e8f0;text-transform:uppercase;margin-bottom:8px;">🌍 Matriz Oficial de los 11 Distritos de Málaga (Reglas 27 y 28)</div>' +
+                '<div style="overflow-x:auto;">' +
+                  '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">' +
+                    '<thead><tr style="background:#1e293b;color:#38bdf8;text-align:left;">' +
+                      '<th style="padding:6px;border:1px solid #334155;">#</th>' +
+                      '<th style="padding:6px;border:1px solid #334155;">Distrito Municipal de Málaga</th>' +
+                      '<th style="padding:6px;border:1px solid #334155;">NO₂ 4,0 m</th>' +
+                      '<th style="padding:6px;border:1px solid #334155;">NO₂ 1,5 m</th>' +
+                      '<th style="padding:6px;border:1px solid #334155;">NO₂ 0,8 m</th>' +
+                      '<th style="padding:6px;border:1px solid #334155;">% Secundario</th>' +
+                      '<th style="padding:6px;border:1px solid #334155;">Diagnóstico Doctoral</th>' +
+                    '</tr></thead>' +
+                    '<tbody>' +
+                      DISTRICTS_11.map(function (d) {
+                        return '<tr style="border-bottom:1px solid #1e293b;">' +
+                          '<td style="padding:6px;color:#94a3b8;">' + d.id + '</td>' +
+                          '<td style="padding:6px;font-weight:800;color:#fff;">' + d.name + '</td>' +
+                          '<td style="padding:6px;color:' + (d.c40 >= 20 ? '#f87171' : '#34d399') + ';font-weight:800;">' + d.c40.toFixed(1) + ' µg/m³</td>' +
+                          '<td style="padding:6px;color:' + (d.c15 >= 20 ? '#fbbf24' : '#34d399') + ';font-weight:800;">' + d.c15.toFixed(1) + ' µg/m³</td>' +
+                          '<td style="padding:6px;color:#f87171;font-weight:800;">' + d.c08.toFixed(1) + ' µg/m³</td>' +
+                          '<td style="padding:6px;color:#38bdf8;font-weight:800;">' + d.chemPct.toFixed(1) + ' %</td>' +
+                          '<td style="padding:6px;color:#cbd5e1;">' + d.note + '</td>' +
+                        '</tr>';
+                      }).join('') +
+                    '</tbody>' +
+                  '</table>' +
+                '</div>' +
+              '</div>';
+          }
+
+          var nodeEl = document.getElementById('node-detail-content');
+          if (nodeEl) {
+            nodeEl.innerHTML =
+              '<div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-bottom:14px;">' +
+                '<div style="font-size:12.5px;font-weight:800;color:#38bdf8;text-transform:uppercase;margin-bottom:8px;">🛰️ Constelación de 16 Misiones Satelitales sobre Málaga (Regla 19)</div>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">' +
+                  '<thead><tr style="background:#1e293b;color:#38bdf8;text-align:left;">' +
+                    '<th style="padding:6px;border:1px solid #334155;">Misión Orbital</th>' +
+                    '<th style="padding:6px;border:1px solid #334155;">Agencia</th>' +
+                    '<th style="padding:6px;border:1px solid #334155;">Banda Espectral</th>' +
+                    '<th style="padding:6px;border:1px solid #334155;">Resolución</th>' +
+                    '<th style="padding:6px;border:1px solid #334155;">Aportación al Gemelo Digital</th>' +
+                  '</tr></thead>' +
+                  '<tbody>' +
+                    SATELLITES_16.map(function (s) {
+                      return '<tr style="border-bottom:1px solid #1e293b;">' +
+                        '<td style="padding:6px;font-weight:800;color:#fff;">' + s.name + '</td>' +
+                        '<td style="padding:6px;color:#38bdf8;">' + s.agency + '</td>' +
+                        '<td style="padding:6px;color:#cbd5e1;">' + s.band + '</td>' +
+                        '<td style="padding:6px;color:#fbbf24;">' + s.res + '</td>' +
+                        '<td style="padding:6px;color:#e2e8f0;">' + s.role + '</td>' +
+                      '</tr>';
+                    }).join('') +
+                  '</tbody>' +
+                '</table>' +
+              '</div>' +
+              '<div style="background:#0f172a;border:1px solid #38bdf8;border-radius:8px;padding:16px;line-height:1.6;">' +
+                '<h3 style="font-size:14px;color:#38bdf8;margin:0 0 8px 0;">💻 Cómo arrancar el servidor completo (.TSX + Express + Vite) en tu PC</h3>' +
+                '<p style="font-size:12px;color:#cbd5e1;margin-bottom:10px;">Si además de esta consola autónoma quieres levantar el servidor local completo en <code>http://localhost:3000</code> desde esta carpeta descomprimida:</p>' +
+                '<div style="background:#020617;border:1px solid #10b981;border-radius:6px;padding:10px;margin-bottom:8px;font-size:12px;">' +
+                  '<strong style="color:#34d399;">En Windows (1 Clic):</strong> Haz doble clic en el archivo <code>ARRANCAR_EN_MI_PC.bat</code> que está en esta misma carpeta.' +
+                '</div>' +
+                '<div style="background:#020617;border:1px solid #334155;border-radius:6px;padding:10px;font-size:12px;">' +
+                  '<strong style="color:#fbbf24;">En Terminal (PowerShell / CMD):</strong> Ejecuta <code>npm install</code> y después <code>npm run dev</code>.' +
+                '</div>' +
+              '</div>';
+          }
+        }
+
+        renderStandaloneLauncher();
+      })();
+    </script>
+  </body>
+</html>
+

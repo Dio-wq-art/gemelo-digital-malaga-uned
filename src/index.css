@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@layer base {
+  html,
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+  }
+}
+
+/* Nitidez vectorial para ecuaciones KaTeX y tablas numéricas */
+.katex {
+  font-size: 1.08em !important;
+  color: #f8fafc;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 500;
+}
+
+.katex .mord,
+.katex .mbin,
+.katex .mrel,
+.katex .mop,
+.katex .mpunct {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+}
+
+.katex-display {
+  margin: 0.35em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.math-formula-rendered {
+  line-height: 1.5;
+  letter-spacing: 0.012em;
+}
+
+/* Números tabulares de alta definición en paneles científicos */
+.font-mono,
+table,
+td,
+th {
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mejora global de definición tipográfica en micro-etiquetas y SVG dentro de ventanas */
+svg text {
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Barra de desplazamiento estilizada de alta precisión para ventanas redimensionables */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.5);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.85);
+}
+
+/* Ocultar barra de desplazamiento estándar manteniendo la funcionalidad de scroll horizontal */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Transición suave y soporte táctil inercial para barras y ventanas */
+.smooth-horizontal-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.custom-scrollbar {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Protección elástica de tablas científicas y ecuaciones en Tabletas y Teléfonos (< 768px) */
+@media (max-width: 768px) {
+  .draggable-window-content table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Eliminación del marco blanco por defecto de MapLibre en Popups científicos */
+.maplibregl-popup-content {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0.5rem !important;
+}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: rgba(99, 102, 241, 0.85) !important;
+}
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: rgba(99, 102, 241, 0.85) !important;
+}
+
+
